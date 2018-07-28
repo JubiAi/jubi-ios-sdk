@@ -15,6 +15,5 @@ typedef void (^AlertCompletionBlock) (NSInteger index, NSString *buttonTitle);
                dismissedWith:(AlertCompletionBlock)completionBlock;
 
 -(void)displayInformativeAlertwithTitle:(NSString *)title andMessage:(NSString*)message onController:(UIViewController*)controller;
--(void)presentAlertForInputWithTitle:(NSString *)title andMessage:(NSString*)message onController:(UIViewController*)controller dismissedWith:(AlertCompletionBlock)completionBlock;
 @end
 
