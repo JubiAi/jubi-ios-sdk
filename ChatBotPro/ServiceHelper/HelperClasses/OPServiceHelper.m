@@ -11,7 +11,7 @@
 #import<CoreTelephony/CTCarrier.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import "Header.h"
-
+#import "AppManager.h"
 
 #define kHudHideAnimationTime   0.0
 
@@ -76,7 +76,7 @@ static OPServiceHelper *serviceHelper = nil;
     OPRequestComplitopnBlock completionBlock = [block copy];
     dispatch_async(dispatch_get_main_queue(), ^{
         
-        if(![APPDELEGATE isReachable])
+        if(![[AppManager sharedManager] isReachable])
         {
             [OPRequestTimeOutView showWithMessage:kNetworkErrorMessage forTime:3.0];
             completionBlock(nil, [NSError errorWithDomain:@"com.mpos" code:100 userInfo:nil]);

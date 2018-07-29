@@ -10,7 +10,6 @@
 #define MPOSApp_Header_h
 
 
-#define APPDELEGATE (AppDelegate *)[[UIApplication sharedApplication] delegate]
 
 #define APP_COLOR [UIColor colorWithRed:50.0 green:163.0 blue:213.0 alpha:1.0]
 #define APP_BLUE_COLOR [UIColor colorWithRed:0.0 green:201.0/255.0 blue:217.0/255.0 alpha:1.0]

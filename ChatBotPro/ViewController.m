@@ -765,7 +765,7 @@
 }
 
 -(void)addMessageReplyToArray:(NSDictionary *)messageDict{
-     [MBProgressHUD hideHUDForView:[APPDELEGATE window] animated:YES];
+     [MBProgressHUD hideHUDForView:[Utility getWindow] animated:YES];
     if([[messageDict objectForKey:@"answerType"] isEqualToString:@"text"]){
         id object = [self dictionaryFromString:[messageDict objectForKey:@"botMessage"]];
         if ([object isKindOfClass:[NSArray class]]) {

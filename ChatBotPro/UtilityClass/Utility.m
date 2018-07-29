@@ -196,5 +196,8 @@
     return  fileExtension;
 }
 
-
++(UIWindow *)getWindow{
+    UIWindow *window = [UIApplication sharedApplication].delegate.window;
+    return window;
+}
 @end

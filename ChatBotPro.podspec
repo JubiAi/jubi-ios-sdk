@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "ChatBotPro"
-  s.version      = "0.0.4"
+  s.version      = "0.0.5"
   s.summary      = "Pod for ChatBotPro."
 
   # This description is used to generate tags and improve search results.
@@ -135,6 +135,7 @@ This pod is created for chatbot
   # s.requires_arc = true
 
   # s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
+s.static_framework = true
    s.dependency "Firebase/Core"
 s.dependency "Vertigo"
 #s.dependency "FirebaseMessaging"

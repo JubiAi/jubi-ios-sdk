@@ -10,7 +10,7 @@
 #import "Utility.h"
 #import "TGRImageViewController.h"
 #import "TGRImageZoomAnimationController.h"
-
+#import "AppManager.h"
 @interface ViewController : UIViewController<UIViewControllerTransitioningDelegate>
 @property (strong, nonatomic) NSMutableArray *messageList;
 @property(nonatomic,retain)UIPopoverPresentationController *dateTimePopover8;

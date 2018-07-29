@@ -5,8 +5,9 @@
 //
 
 #import "ServiceHelper.h"
-#import "AppDelegate.h"
 #import "Header.h"
+#import "AppManager.h"
+#import "Utility.h"
 
 #pragma mark - HTTPClient class definition
 
@@ -71,7 +72,7 @@ static ServiceHelper *_sharedHelper;
 //
 -(void)callWebServiceWithRequest:(NSURLRequest*)request andMethodName:(WebMethodType)methodName andControllerToShowHud:(BOOL)showHud{
     
-    if (![APPDELEGATE isReachable]) {
+    if (![[AppManager sharedManager] isReachable]) {
         if (methodName == WebMethodLogin || methodName == WebMethodForgotPassword) {
             showAlert(@"Sorry", @"Your internet connection appears to be offline.Please check and try again.");
         }
@@ -80,8 +81,8 @@ static ServiceHelper *_sharedHelper;
     
     if (showHud) {
         
-        [MBProgressHUD hideHUDForView:[APPDELEGATE window] animated:YES];
-        [MBProgressHUD showHUDAddedTo:[APPDELEGATE window] animated:YES];
+        [MBProgressHUD hideHUDForView:[Utility getWindow] animated:YES];
+        [MBProgressHUD showHUDAddedTo:[Utility getWindow] animated:YES];
     }
     
     NSLog(@"request URL : %@", [request URL]);
@@ -92,7 +93,7 @@ static ServiceHelper *_sharedHelper;
         [HUD hide:YES afterDelay:kHudHideAnimationTime];
         if (showHud) {
             
-            [MBProgressHUD hideHUDForView:[APPDELEGATE window] animated:YES];
+            [MBProgressHUD hideHUDForView:[Utility getWindow] animated:YES];
         }
         
         if (!self || !self.serviceHelperDelegate)
@@ -114,7 +115,7 @@ static ServiceHelper *_sharedHelper;
         
     } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
         [HUD hide:YES afterDelay:kHudHideAnimationTime];
-        [MBProgressHUD hideHUDForView:[APPDELEGATE window] animated:YES];
+        [MBProgressHUD hideHUDForView:[Utility getWindow] animated:YES];
         if ([error code] == NSURLErrorCancelled)
             return ;
         if (!self || !self.serviceHelperDelegate)

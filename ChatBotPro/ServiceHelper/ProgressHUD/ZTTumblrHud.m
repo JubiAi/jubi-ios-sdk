@@ -5,7 +5,8 @@
 
 #import "ZTTumblrHud.h"
 #import "Header.h"
-
+#import "AppManager.h"
+#import "Utility.h"
 #define kShowHideAnimateDuration 0.2
 
 
@@ -123,7 +124,7 @@ static ZTTumblrHud *_sharedInstance = nil;
 }
 
 -(void)hideHUD{
-    [[APPDELEGATE window] setUserInteractionEnabled:YES];
+    [[Utility getWindow] setUserInteractionEnabled:YES];
     if (self != nil) {
         [self removeFromSuperview];
     }

@@ -6,6 +6,7 @@
 
 #import "MBProgressHUD.h"
 #import "ZTTumblrHud.h"
+#import "Utility.h"
 
 #if __has_feature(objc_arc)
 	#define MB_AUTORELEASE(exp) exp
@@ -106,7 +107,7 @@ static const CGFloat kDetailsLabelFontSize = 15.f;
 
 + (id)showHUDAddedTo:(UIView *)view animated:(BOOL)animated {
 	//MBProgressHUD *hud = [[self alloc] initWithView:view];
-    [[APPDELEGATE window] setUserInteractionEnabled:NO];
+    [[Utility getWindow] setUserInteractionEnabled:NO];
     ZTTumblrHud *hud = [[ZTTumblrHud alloc] initWithFrame:CGRectMake((CGFloat) (56),
                                                                            (CGFloat) ((view.frame.size.height - 20) * 0.75), 55, 20)];
 //    ZTTumblrHud *hud = [[ZTTumblrHud alloc] initWithFrame:CGRectMake((CGFloat) ((view.frame.size.width - 55) * 0.5),
@@ -132,7 +133,7 @@ static const CGFloat kDetailsLabelFontSize = 15.f;
 
 + (BOOL)hideHUDForView:(UIView *)view animated:(BOOL)animated {
 	ZTTumblrHud *hud = [self HUDForView:view];
-    [[APPDELEGATE window] setUserInteractionEnabled:YES];
+    [[Utility getWindow] setUserInteractionEnabled:YES];
 	if (hud != nil) {
 		[hud removeFromSuperview];
 		[hud showAnimated:NO];

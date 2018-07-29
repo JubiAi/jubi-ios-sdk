@@ -43,5 +43,30 @@
     return self;
 }
 
+-(void)checkReachability{
+    
+    Rechability * reach = [Rechability reachabilityForInternetConnection];
+    self.isReachable = [reach isReachable];
+    
+    
+    
+    reach.reachableBlock = ^(Rechability * reachability)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.isReachable = YES;
+            
+        });
+    };
+    
+    reach.unreachableBlock = ^(Rechability * reachability)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.isReachable = NO;
+        });
+    };
+    
+    [reach startNotifier];
+}
+
 @end
 

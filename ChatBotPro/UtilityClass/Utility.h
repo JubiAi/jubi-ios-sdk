@@ -7,12 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Utility : NSObject
 +(NSData *)getFileInDocDir:(NSString *)strUrl;
 +(void)saveFile:(NSString *)strUrl;
++(UIWindow *)getWindow;
 @end
 
 NS_ASSUME_NONNULL_END
