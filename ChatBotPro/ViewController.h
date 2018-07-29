@@ -8,8 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "Utility.h"
-#import "TGRImageViewController.h"
-#import "TGRImageZoomAnimationController.h"
+#import <Vertigo/TGRImageViewController.h>
+#import <Vertigo/TGRImageZoomAnimationController.h>
 #import "AppManager.h"
 @interface ViewController : UIViewController<UIViewControllerTransitioningDelegate>
 @property (strong, nonatomic) NSMutableArray *messageList;
