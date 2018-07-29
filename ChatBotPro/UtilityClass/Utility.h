@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "ViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 +(NSData *)getFileInDocDir:(NSString *)strUrl;
 +(void)saveFile:(NSString *)strUrl;
 +(UIWindow *)getWindow;
-+(NSBundle *)getBundleForChatBotPro:(NSString *)identifier;
++(NSBundle *)getBundleForChatBotPro;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -201,8 +201,8 @@
     return window;
 }
 
-+(NSBundle *)getBundleForChatBotPro:(NSString *)identifier{
-    NSBundle *bundle = [NSBundle bundleForClass:identifier.classForCoder];
++(NSBundle *)getBundleForChatBotPro{
+    NSBundle *bundle = [NSBundle bundleForClass:ViewController.classForCoder];
     NSURL *bundleURL = [[bundle resourceURL] URLByAppendingPathComponent:@"ChatBotPro.bundle"];
     NSBundle *resourceBundle = [NSBundle bundleWithURL:bundleURL];
     return resourceBundle;
