@@ -200,4 +200,11 @@
     UIWindow *window = [UIApplication sharedApplication].delegate.window;
     return window;
 }
+
++(NSBundle *)getBundleForChatBotPro:(NSString *)identifier{
+    NSBundle *bundle = [NSBundle bundleForClass:identifier.classForCoder];
+    NSURL *bundleURL = [[bundle resourceURL] URLByAppendingPathComponent:@"ChatBotPro.bundle"];
+    NSBundle *resourceBundle = [NSBundle bundleWithURL:bundleURL];
+    return resourceBundle;
+}
 @end

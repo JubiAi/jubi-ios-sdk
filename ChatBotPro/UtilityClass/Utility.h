@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 +(NSData *)getFileInDocDir:(NSString *)strUrl;
 +(void)saveFile:(NSString *)strUrl;
 +(UIWindow *)getWindow;
++(NSBundle *)getBundleForChatBotPro:(NSString *)identifier;
 @end
 
 NS_ASSUME_NONNULL_END

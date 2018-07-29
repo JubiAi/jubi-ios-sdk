@@ -32,8 +32,8 @@
 }
 
 -(IBAction)startBotAction:(id)sender{
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    ViewController *VC = [storyboard instantiateViewControllerWithIdentifier:@"ViewController"];
+    NSBundle *resourceBundle = [Utility getBundleForChatBotPro:@"ViewController"];
+    ViewController *VC = [[UIStoryboard storyboardWithName:@"Main" bundle:resourceBundle] instantiateInitialViewController];
     [self presentViewController:VC animated:YES completion:^{
       [[NSNotificationCenter defaultCenter] postNotificationName:@"initialCallNotification" object:nil];
     }];
