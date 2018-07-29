@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
 This pod is created for chatbot
                    DESC
 
-  s.homepage     = "git@github.com:ranapnm123/ChatBotPro"
+  s.homepage     = "https://github.com/ranapnm123/ChatBotPro"
   # s.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
 
@@ -80,7 +80,7 @@ This pod is created for chatbot
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "git@github.com:ranapnm123/ChatBotPro.git", :tag => "#{s.version.to_s}" }
+  s.source       = { :git => "https://github.com/ranapnm123/ChatBotPro.git", :tag => "#{s.version.to_s}" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -107,7 +107,7 @@ This pod is created for chatbot
 
   # s.resource  = "icon.png"
   # s.resources = "Resources/*.png"
-    s.resource_bundle = { 'ChatBotPro' => [ 'ChatBotPro/**/*.{png,jpg,storyboard,xib,lproj}' ] }
+    s.resource_bundle = { 'ChatBotPro' => [ 'ChatBotPro/**/*.{png,jpg,storyboard,xib,lproj,xcassets}' ] }
     #s.resources = “ChatBotPro/*.storyboard”, “ChatBotPro/*.xcassets” 
 
   # s.preserve_paths = "FilesToSave", "MoreFilesToSave"
