@@ -332,16 +332,15 @@
             info1.fileNameStr = [imageURL lastPathComponent];
             info1.isSender = true;
             info1.imageURL = imageURL;
-//            [self.messageList addObject:info1];
+            [self.messageList addObject:info1];
             
-//            [self.messageList addObject:info1];
-//            [self.myTableView reloadData];
-//            [self.myTableView
-//             scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-//                                                       inSection:0]
-//             atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+            [self.messageList addObject:info1];
+            [self.myTableView reloadData];
+            [self.myTableView
+             scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
+                                                       inSection:0]
+             atScrollPosition:UITableViewScrollPositionBottom animated:YES];
             
-            [self sendImageToServer:info1];
             
         } else if ([mediaType isEqualToString:@"public.movie"]){
             
@@ -364,18 +363,17 @@
             info1.fileNameStr = videoURL.lastPathComponent;
             info1.videoURL = videoURL;
             info1.isSender = true;
-//            [self.messageList addObject:info1];
-            [self sendImageToServer:info1];
+            [self.messageList addObject:info1];
         }
     } else {
         // Fallback on earlier versions
     }
     
-//    [self.myTableView reloadData];
-//    [self.myTableView
-//     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-//                                               inSection:0]
-//     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    [self.myTableView reloadData];
+    [self.myTableView
+     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
+                                               inSection:0]
+     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
     [picker dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -404,13 +402,12 @@
     info1.fileNameStr = [request.URL lastPathComponent];
     info1.isDoc = true;
     info1.isSender = true;
-//    [self.messageList addObject:info1];
-    [self sendImageToServer:info1];
-//    [self.myTableView reloadData];
-//    [self.myTableView
-//     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-//                                               inSection:0]
-//     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    [self.messageList addObject:info1];
+    [self.myTableView reloadData];
+    [self.myTableView
+     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
+                                               inSection:0]
+     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 
 #pragma mark - UITextField Delegate Methode
@@ -1011,124 +1008,7 @@
     
 }
     
-    -(void)sendImageToServer:(MessageInfo *)info{
-        NSURL *uploadingFileURL;
-        if(info.videoURL != nil || info.isDoc == YES){
-            uploadingFileURL = info.videoURL;
-        }
-        if(info.imageURL != nil){
-        uploadingFileURL = info.imageURL;
-        }
-        NSData *data = [NSData dataWithContentsOfURL:uploadingFileURL];
-        self.completionHandler = ^(AWSS3TransferUtilityUploadTask *task, NSError *error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (error) {
-//                    weakSelf.statusLabel.text = @"Failed to Upload";
-                } else {
-//                    weakSelf.statusLabel.text = @"Successfully Uploaded";
-//                    weakSelf.progressView.progress = 1.0;
-                }
-            });
-        };
-        
-        self.progressBlock = ^(AWSS3TransferUtilityTask *task, NSProgress *progress) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-//                weakSelf.progressView.progress = progress.fractionCompleted;
-            });
-        };
-        
-        AWSS3TransferUtility *transferUtility = [AWSS3TransferUtility defaultS3TransferUtility];
-        [transferUtility enumerateToAssignBlocksForUploadTask:^(AWSS3TransferUtilityUploadTask * _Nonnull uploadTask, AWSS3TransferUtilityProgressBlock  _Nullable __autoreleasing * _Nullable uploadProgressBlockReference, AWSS3TransferUtilityUploadCompletionHandlerBlock  _Nullable __autoreleasing * _Nullable completionHandlerReference) {
-            NSLog(@"%lu", (unsigned long)uploadTask.taskIdentifier);
-            
-//            *uploadProgressBlockReference = weakSelf.progressBlock;
-//            *completionHandlerReference = weakSelf.completionHandler;
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-//                self.statusLabel.text = @"Uploading...";
-            });
-        } downloadTask:nil];
-//        AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
-//
-//        AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
-//         uploadRequest.ACL = AWSS3BucketCannedACLPublicRead;
-//        uploadRequest.bucket = kAWSBucketName;
-//        uploadRequest.key = info.fileNameStr;
-//        uploadRequest.body = uploadingFileURL;
-//        uploadRequest.contentType = @"image/png";
-       
-        
 
-
-  /*  [[transferManager upload:uploadRequest] continueWithExecutor:[AWSExecutor mainThreadExecutor]
-           withBlock:^id(AWSTask *task) {
-               if (task.error) {
-                   if ([task.error.domain isEqualToString:AWSS3TransferManagerErrorDomain]) {
-                       switch (task.error.code) {
-                           case AWSS3TransferManagerErrorCancelled:
-                           case AWSS3TransferManagerErrorPaused:
-                           break;
-                           
-                           default:
-                           NSLog(@"Error: %@", task.error);
-                           break;
-                       }
-                   } else {
-                       // Unknown error.
-                       NSLog(@"Error: %@", task.error);
-                   }
-               }
-               
-               if (task.result) {
-                   AWSS3TransferManagerUploadOutput *uploadOutput = task.result;
-                   
-                   
-                   NSString *s3URL = [NSString stringWithFormat:@"https://s3-ap-south-1.amazonaws.com/%@/%@",kAWSBucketName,info.fileNameStr];
-                   NSLog(@"%@, The file uploaded successfully.",s3URL);
-   NSURL *downloadingFileURL = [NSURL URLWithString:s3URL];
-   
-   AWSS3TransferManagerDownloadRequest *downloadRequest = [AWSS3TransferManagerDownloadRequest new];
-   
-   downloadRequest.bucket = uploadRequest.bucket;
-   downloadRequest.key = uploadRequest.key;
-   downloadRequest.downloadingFileURL = downloadingFileURL;
-[[transferManager download:downloadRequest ] continueWithExecutor:[AWSExecutor mainThreadExecutor]
-       withBlock:^id(AWSTask *task) {
-           if (task.error){
-               if ([task.error.domain isEqualToString:AWSS3TransferManagerErrorDomain]) {
-                   switch (task.error.code) {
-                       case AWSS3TransferManagerErrorCancelled:
-                       case AWSS3TransferManagerErrorPaused:
-                           break;
-                           
-                       default:
-                           NSLog(@"Error: %@", task.error);
-                           break;
-                   }
-                   
-               } else {
-                   NSLog(@"Error: %@", task.error);
-               }
-           }
-           
-           if (task.result) {
-               AWSS3TransferManagerDownloadOutput *downloadOutput = task.result;
-           }
-           return nil;
-       }];
-                   [self.messageList addObject:info];
-                   [self.myTableView reloadData];
-                   [self.myTableView
-                    scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-                                                              inSection:0]
-                    atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-                  
-                   [self callAPIToSubmitAttachment:s3URL];
-               }
-               return nil;
-           }];
-   */
-    }
 
 -(void)callApi:(NSString*)text{
     
