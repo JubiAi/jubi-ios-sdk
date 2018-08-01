@@ -8,12 +8,17 @@
 
 #import <UIKit/UIKit.h>
 #import "Utility.h"
-#import <Vertigo/TGRImageViewController.h>
-#import <Vertigo/TGRImageZoomAnimationController.h>
+#import "TGRImageViewController.h"
+#import "TGRImageZoomAnimationController.h"
 #import "AppManager.h"
+#import <AWSS3/AWSS3.h>
+#import <AWSCore/AWSCore.h>
+#import <AWSCore/AWSCore.h>
+
 @interface ViewController : UIViewController<UIViewControllerTransitioningDelegate>
 @property (strong, nonatomic) NSMutableArray *messageList;
 @property(nonatomic,retain)UIPopoverPresentationController *dateTimePopover8;
-
+@property (copy, nonatomic) AWSS3TransferUtilityUploadCompletionHandlerBlock completionHandler;
+@property (copy, nonatomic) AWSS3TransferUtilityProgressBlock progressBlock;
 @end
 
