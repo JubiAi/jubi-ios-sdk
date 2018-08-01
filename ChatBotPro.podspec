@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "ChatBotPro"
-  s.version      = "0.0.13"
+  s.version      = "0.0.14"
   s.summary      = "Pod for ChatBotPro."
 
   # This description is used to generate tags and improve search results.
