@@ -139,4 +139,7 @@ This pod is created for chatbot
    s.dependency "Firebase/Core"
    s.dependency "Vertigo"
    s.dependency "FirebaseMessaging"
+   s.dependency 'AWSS3', '~> 2.6.13'            # For file transfers
+   s.dependency 'AWSMobileClient', '~> 2.6.13'  # For AWSMobileClient
+   s.dependency 'AWSCognito', '~> 2.6.13'       # For data sync
 end
