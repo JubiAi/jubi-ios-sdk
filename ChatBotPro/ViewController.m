@@ -61,9 +61,9 @@
     [self initialSetup];
     [self setDummyData];
     
-    AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc] initWithRegionType:AWSRegionAPSouth1 identityPoolId:@"ap-south-1:392c5499-a210-4b1d-b55a-b170cd1cd7fa"];
-    AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:AWSRegionUSEast1 credentialsProvider:credentialsProvider];
-    AWSServiceManager.defaultServiceManager.defaultServiceConfiguration = configuration;
+//    AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc] initWithRegionType:AWSRegionAPSouth1 identityPoolId:@"ap-south-1:392c5499-a210-4b1d-b55a-b170cd1cd7fa"];
+//    AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:AWSRegionUSEast1 credentialsProvider:credentialsProvider];
+//    AWSServiceManager.defaultServiceManager.defaultServiceConfiguration = configuration;
 
     //    dispatch_async(dispatch_get_main_queue(), ^{
 //        [self.myTableView
