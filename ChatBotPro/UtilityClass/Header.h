@@ -194,4 +194,5 @@ static NSString *pInventryStatusNon         = @"none";
 static NSString *pInventryStatusExchange    = @"exchanged";
 static NSString *pInventryStatusRefunded    = @"refunded";
 
+static NSString *sProjectName = @"ChatBot";
 #endif
