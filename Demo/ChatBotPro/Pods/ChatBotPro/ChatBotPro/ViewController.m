@@ -40,6 +40,8 @@
 @property (weak, nonatomic) IBOutlet UIView *menuView;
 @property (weak, nonatomic) IBOutlet UIButton *menuBtn;
 @property (strong, nonatomic) UIImageView *previewImage;
+@property (strong, nonatomic) NSString *projectID;
+@property (strong, nonatomic) NSString *baseURL;
 @end
 
 @implementation ViewController
@@ -60,6 +62,8 @@
     [self initialSetup];
     [self setDummyData];
     
+    _projectID = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ChatBotProjectID"];
+    _baseURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ChatBotBaseURL"];
     
 //    dispatch_async(dispatch_get_main_queue(), ^{
 //        [self.myTableView
@@ -724,9 +728,9 @@
     NSString *token = [[NSUserDefaults standardUserDefaults] stringForKey:@"token"];
     NSMutableDictionary * requestDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                          message, @"lastAnswer",
-                                         token, @"iosId",@"JUBI15Q9uk_EarlySalary",@"projectId",nil];
+                                         token, @"iosId",_projectID,@"projectId",nil];
 
-    [[OPServiceHelper sharedServiceHelper] PostAPICallWithParameter:requestDict apiName:kBaseUrl methodName:WebMethodLogin WithComptionBlock:^(id result, NSError *error) {
+    [[OPServiceHelper sharedServiceHelper] PostAPICallWithParameter:requestDict apiName:_baseURL methodName:WebMethodLogin WithComptionBlock:^(id result, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self removeProgressCell];
             if(!error){

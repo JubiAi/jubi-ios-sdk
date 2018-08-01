@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		264F1B03210CF0680068D884 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 264F1B02210CF0680068D884 /* AppDelegate.m */; };
-		264F1B06210CF0680068D884 /* CBViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 264F1B05210CF0680068D884 /* CBViewController.m */; };
-		264F1B09210CF0680068D884 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 264F1B07210CF0680068D884 /* Main.storyboard */; };
 		264F1B0B210CF06A0068D884 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 264F1B0A210CF06A0068D884 /* Assets.xcassets */; };
 		264F1B0E210CF06A0068D884 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 264F1B0C210CF06A0068D884 /* LaunchScreen.storyboard */; };
 		264F1B11210CF06A0068D884 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 264F1B10210CF06A0068D884 /* main.m */; };
+		266856E721121BA100A8549D /* CBViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 266856E621121BA100A8549D /* CBViewController.m */; };
+		266856E921121F9B00A8549D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 266856E821121F9B00A8549D /* Main.storyboard */; };
 		6559C267A21C600AB0844604 /* libPods-ChatBotPro.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7641CB7943F36B27F66F36 /* libPods-ChatBotPro.a */; };
 /* End PBXBuildFile section */
 
@@ -21,13 +21,13 @@
 		264F1AFE210CF0680068D884 /* ChatBotPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatBotPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		264F1B01210CF0680068D884 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		264F1B02210CF0680068D884 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		264F1B04210CF0680068D884 /* CBViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBViewController.h; sourceTree = "<group>"; };
-		264F1B05210CF0680068D884 /* CBViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBViewController.m; sourceTree = "<group>"; };
-		264F1B08210CF0680068D884 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		264F1B0A210CF06A0068D884 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		264F1B0D210CF06A0068D884 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		264F1B0F210CF06A0068D884 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		264F1B10210CF06A0068D884 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		266856E521121BA100A8549D /* CBViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBViewController.h; sourceTree = "<group>"; };
+		266856E621121BA100A8549D /* CBViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBViewController.m; sourceTree = "<group>"; };
+		266856E821121F9B00A8549D /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		8B3807A387FE9241D298FDCB /* Pods-ChatBotPro.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatBotPro.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ChatBotPro/Pods-ChatBotPro.debug.xcconfig"; sourceTree = "<group>"; };
 		AB7641CB7943F36B27F66F36 /* libPods-ChatBotPro.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ChatBotPro.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -67,9 +67,9 @@
 			children = (
 				264F1B01210CF0680068D884 /* AppDelegate.h */,
 				264F1B02210CF0680068D884 /* AppDelegate.m */,
-				264F1B04210CF0680068D884 /* CBViewController.h */,
-				264F1B05210CF0680068D884 /* CBViewController.m */,
-				264F1B07210CF0680068D884 /* Main.storyboard */,
+				266856E521121BA100A8549D /* CBViewController.h */,
+				266856E621121BA100A8549D /* CBViewController.m */,
+				266856E821121F9B00A8549D /* Main.storyboard */,
 				264F1B0A210CF06A0068D884 /* Assets.xcassets */,
 				264F1B0C210CF06A0068D884 /* LaunchScreen.storyboard */,
 				264F1B0F210CF06A0068D884 /* Info.plist */,
@@ -154,9 +154,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				266856E921121F9B00A8549D /* Main.storyboard in Resources */,
 				264F1B0E210CF06A0068D884 /* LaunchScreen.storyboard in Resources */,
 				264F1B0B210CF06A0068D884 /* Assets.xcassets in Resources */,
-				264F1B09210CF0680068D884 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,23 +208,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				264F1B06210CF0680068D884 /* CBViewController.m in Sources */,
 				264F1B11210CF06A0068D884 /* main.m in Sources */,
 				264F1B03210CF0680068D884 /* AppDelegate.m in Sources */,
+				266856E721121BA100A8549D /* CBViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		264F1B07210CF0680068D884 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				264F1B08210CF0680068D884 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		264F1B0C210CF06A0068D884 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CBViewController.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 

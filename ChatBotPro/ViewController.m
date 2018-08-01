@@ -25,8 +25,7 @@
 #import "ProgressCell.h"
 #import "AttachmentCell.h"
 
-#define kAWSBucketName @"mobile-dev-jubi"
-
+#define kBaseUrl @"https://early-salary-backend.herokuapp.com/ios/JUBI15Q9uk_EarlySalary"
 
 @interface ViewController ()<UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIDocumentMenuDelegate,UIDocumentPickerDelegate, UIPopoverPresentationControllerDelegate>
 
@@ -61,11 +60,13 @@
     [self initialSetup];
     [self setDummyData];
     
-//    AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc] initWithRegionType:AWSRegionAPSouth1 identityPoolId:@"ap-south-1:392c5499-a210-4b1d-b55a-b170cd1cd7fa"];
-//    AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:AWSRegionUSEast1 credentialsProvider:credentialsProvider];
-//    AWSServiceManager.defaultServiceManager.defaultServiceConfiguration = configuration;
-
- 
+    
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [self.myTableView
+//         scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
+//                                                   inSection:0]
+//         atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+//    });
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(receiveTestNotification:)
@@ -302,75 +303,45 @@
 
 
 #pragma mark - UIImagePicker Delegate
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+2q``    (NSDictionary *)info {
     
     NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
-    if (@available(iOS 11.0, *)) {
-        NSURL *imageURL;
-        if ([mediaType isEqualToString:@"public.image"]) {
-             UIImage *chosenImage = info[UIImagePickerControllerOriginalImage];
-            if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
-                            NSString *fileName = [[[NSProcessInfo processInfo] globallyUniqueString] stringByAppendingString:@".png"];
-                            NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
-                            NSData * imageData = UIImagePNGRepresentation(chosenImage);
-                            [imageData writeToFile:filePath atomically:YES];
-                imageURL = [NSURL URLWithString:filePath];
-                
-            }
-                else{
-                    imageURL = [info objectForKey:UIImagePickerControllerImageURL];
-                }
-           
-  
-            MessageInfo *info1 = [MessageInfo new];
-            info1.imageName = chosenImage;
-            info1.fileNameStr = [imageURL lastPathComponent];
-            info1.isSender = true;
-            info1.imageURL = imageURL;
-//            [self.messageList addObject:info1];
-            
-//            [self.messageList addObject:info1];
-//            [self.myTableView reloadData];
-//            [self.myTableView
-//             scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-//                                                       inSection:0]
-//             atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-            
-            [self sendImageToServer:info1];
-            
-        } else if ([mediaType isEqualToString:@"public.movie"]){
-            
-            NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
-            
-            
-            AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
-            AVAssetImageGenerator *gen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
-            gen.appliesPreferredTrackTransform = YES;
-            CMTime time = CMTimeMakeWithSeconds(0.0, 600);
-            NSError *error = nil;
-            CMTime actualTime;
-            
-            CGImageRef image = [gen copyCGImageAtTime:time actualTime:&actualTime error:&error];
-            UIImage *thumbnail = [[UIImage alloc] initWithCGImage:image];
-            CGImageRelease(image);
-            
-            MessageInfo *info1 = [MessageInfo new];
-            info1.thumbnailImage = thumbnail;
-            info1.fileNameStr = videoURL.lastPathComponent;
-            info1.videoURL = videoURL;
-            info1.isSender = true;
-//            [self.messageList addObject:info1];
-            [self sendImageToServer:info1];
-        }
-    } else {
-        // Fallback on earlier versions
+    
+    if ([mediaType isEqualToString:@"public.image"]) {
+        
+        UIImage *chosenImage = info[UIImagePickerControllerOriginalImage];
+        MessageInfo *info1 = [MessageInfo new];
+        info1.imageName = chosenImage;
+        info1.isSender = true;
+        [self.messageList addObject:info1];
+        
+    } else if ([mediaType isEqualToString:@"public.movie"]){
+        
+        NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
+
+        AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
+        AVAssetImageGenerator *gen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+        gen.appliesPreferredTrackTransform = YES;
+        CMTime time = CMTimeMakeWithSeconds(0.0, 600);
+        NSError *error = nil;
+        CMTime actualTime;
+        
+        CGImageRef image = [gen copyCGImageAtTime:time actualTime:&actualTime error:&error];
+        UIImage *thumbnail = [[UIImage alloc] initWithCGImage:image];
+        CGImageRelease(image);
+
+        MessageInfo *info1 = [MessageInfo new];
+        info1.thumbnailImage = thumbnail;
+        info1.videoURL = videoURL;
+        info1.isSender = true;
+        [self.messageList addObject:info1];
     }
     
-//    [self.myTableView reloadData];
-//    [self.myTableView
-//     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-//                                               inSection:0]
-//     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    [self.myTableView reloadData];
+    [self.myTableView
+     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
+                                               inSection:0]
+     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
     [picker dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -387,25 +358,22 @@
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url {
-    
     NSLog(@"picked %@", url);
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     NSLog(@"extenstion %@", [request.URL lastPathComponent]);
     //UIImage *thumbnail = [UIImage imageNamed:@"document"];
     MessageInfo *info1 = [MessageInfo new];
-    if(url.startAccessingSecurityScopedResource)
     info1.videoURL = url;
     info1.message = [request.URL lastPathComponent];
-    info1.fileNameStr = [request.URL lastPathComponent];
     info1.isDoc = true;
     info1.isSender = true;
-//    [self.messageList addObject:info1];
-    [self sendImageToServer:info1];
-//    [self.myTableView reloadData];
-//    [self.myTableView
-//     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-//                                               inSection:0]
-//     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    [self.messageList addObject:info1];
+    
+    [self.myTableView reloadData];
+    [self.myTableView
+     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
+                                               inSection:0]
+     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 
 #pragma mark - UITextField Delegate Methode
@@ -559,13 +527,11 @@
             SenderImageTableViewCell *cell = (SenderImageTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"SenderImageTableViewCell"];
             cell.playBtn.hidden = true;
             cell.messageImageView.image = info.imageName;
-            if(info.videoURL == nil){
             UIButton *imgBtn = [UIButton buttonWithType:UIButtonTypeCustom];
             imgBtn.frame = cell.messageImageView.frame;
-            imgBtn.tag = indexPath.row + 300;
+            imgBtn.tag = indexPath.row + 300;;
             [imgBtn addTarget:self action:@selector(imageBtnTapped:) forControlEvents:UIControlEventTouchUpInside];
             [cell.contentView addSubview:imgBtn];
-            }
             return cell;
         }
     }else {
@@ -754,50 +720,22 @@
 #pragma mark - Service Helper Methods
 -(void)callAPIToSubmitAnswer:(NSString *)message{
     [self showProgressCell];
-    NSString *projectId = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ChatBotProjectID"];
-    NSString *baseURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ChatBotBaseURL"];
+    
     NSString *token = [[NSUserDefaults standardUserDefaults] stringForKey:@"token"];
     NSMutableDictionary * requestDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                          message, @"lastAnswer",
-                                         token, @"iosId",projectId,@"projectId",nil];
-    
-    [[OPServiceHelper sharedServiceHelper] PostAPICallWithParameter:requestDict apiName:baseURL methodName:WebMethodLogin WithComptionBlock:^(id result, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self removeProgressCell];
-            if(!error){
-                if([[result objectForKeyNotNull:pRESPONSE_CODE expectedObj:@"0"] integerValue] == 200){
-                    
-                    
-                    
-                } else{
-                    
-                }
-            }
-        });
-    }];
-}
+                                         token, @"iosId",@"JUBI15Q9uk_EarlySalary",@"projectId",nil];
 
--(void)callAPIToSubmitAttachment:(NSString *)url{
-    [self showProgressCell];
-    
-    NSString *projectId = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ChatBotProjectID"];
-    NSString *baseURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ChatBotBaseURL"];
-    
-    NSString *token = [[NSUserDefaults standardUserDefaults] stringForKey:@"token"];
-    NSMutableDictionary * requestDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                         @"attachment", @"type",url,@"url",
-                                         token, @"iosId",projectId,@"projectId",nil];
-    
-    [[OPServiceHelper sharedServiceHelper] PostAPICallWithParameter:requestDict apiName:baseURL methodName:WebMethodLogin WithComptionBlock:^(id result, NSError *error) {
+    [[OPServiceHelper sharedServiceHelper] PostAPICallWithParameter:requestDict apiName:kBaseUrl methodName:WebMethodLogin WithComptionBlock:^(id result, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self removeProgressCell];
             if(!error){
                 if([[result objectForKeyNotNull:pRESPONSE_CODE expectedObj:@"0"] integerValue] == 200){
                     
                     
-                    
+
                 } else{
-                    
+
                 }
             }
         });
@@ -1007,97 +945,6 @@
     [self performSelector:@selector(callApi:) withObject:notification.object afterDelay:1];
     
 }
-    
-    -(void)sendImageToServer:(MessageInfo *)info{
-  /*  NSURL *uploadingFileURL;
-    if(info.videoURL != nil || info.isDoc == YES){
-    uploadingFileURL = info.videoURL;
-    }
-    if(info.imageURL != nil){
-    uploadingFileURL = info.imageURL;
-    }
-    AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
-
-    AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
-    [uploadRequest setACL:AWSS3ObjectCannedACLPublicRead];
-    uploadRequest.bucket = kAWSBucketName;
-    uploadRequest.key = info.fileNameStr;
-    uploadRequest.body = uploadingFileURL;
-    //        uploadRequest.contentType = @"image/png";
-
-
-
-
-    [[transferManager upload:uploadRequest] continueWithExecutor:[AWSExecutor mainThreadExecutor]
-    withBlock:^id(AWSTask *task) {
-    if (task.error) {
-    if ([task.error.domain isEqualToString:AWSS3TransferManagerErrorDomain]) {
-    switch (task.error.code) {
-    case AWSS3TransferManagerErrorCancelled:
-    case AWSS3TransferManagerErrorPaused:
-    break;
-
-    default:
-    NSLog(@"Error: %@", task.error);
-    break;
-    }
-    } else {
-    // Unknown error.
-    NSLog(@"Error: %@", task.error);
-    }
-    }
-
-    if (task.result) {
-    AWSS3TransferManagerUploadOutput *uploadOutput = task.result;
-
-
-    NSString *s3URL = [NSString stringWithFormat:@"https://s3-ap-south-1.amazonaws.com/%@/%@",kAWSBucketName,info.fileNameStr];
-    NSLog(@"%@, The file uploaded successfully.",s3URL);
-    NSURL *downloadingFileURL = [NSURL URLWithString:s3URL];
-
-//    AWSS3TransferManagerDownloadRequest *downloadRequest = [AWSS3TransferManagerDownloadRequest new];
-//
-//    downloadRequest.bucket = uploadRequest.bucket;
-//    downloadRequest.key = uploadRequest.key;
-//    downloadRequest.downloadingFileURL = downloadingFileURL;
-//    [[transferManager download:downloadRequest ] continueWithExecutor:[AWSExecutor mainThreadExecutor]
-//       withBlock:^id(AWSTask *task) {
-//           if (task.error){
-//               if ([task.error.domain isEqualToString:AWSS3TransferManagerErrorDomain]) {
-//                   switch (task.error.code) {
-//                           case AWSS3TransferManagerErrorCancelled:
-//                           case AWSS3TransferManagerErrorPaused:
-//                           break;
-//                           
-//                       default:
-//                           NSLog(@"Error: %@", task.error);
-//                           break;
-//                   }
-//                   
-//               } else {
-//                   NSLog(@"Error: %@", task.error);
-//               }
-//           }
-//           
-//           if (task.result) {
-//               AWSS3TransferManagerDownloadOutput *downloadOutput = task.result;
-//           }
-//           return nil;
-//       }];
-    [self.messageList addObject:info];
-    [self.myTableView reloadData];
-    [self.myTableView
-    scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-    inSection:0]
-    atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-
-    [self callAPIToSubmitAttachment:s3URL];
-    }
-    return nil;
-    }];
-   */
-    }
-
 
 -(void)callApi:(NSString*)text{
     

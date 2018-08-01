@@ -41,5 +41,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>ChatBotBaseURL</key>
+	<string>https://early-salary-backend.herokuapp.com/ios/JUBI15Q9uk_EarlySalary</string>
+	<key>ChatBotProjectID</key>
+	<string>JUBI15Q9uk_EarlySalary</string>
 </dict>
 </plist>
