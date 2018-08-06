@@ -17,46 +17,9 @@
                     <view key="view" contentMode="scaleToFill" id="riz-H2-vqq">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wti-e2-t73">
-                                <rect key="frame" x="299" y="592" width="60" height="60"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <state key="normal" backgroundImage="floating"/>
-                                <connections>
-                                    <action selector="startBotAction:" destination="LIL-GJ-tOS" eventType="touchUpInside" id="4l7-vV-Fbu"/>
-                                </connections>
-                            </button>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Kke-dh-kb6">
-                                <rect key="frame" x="99" y="491" width="256" height="92"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <subviews>
-                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" text="Hi, I can help you find all your answers regarding EarlySalary loans" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="eY2-ZP-Ww0">
-                                        <rect key="frame" x="8" y="17" width="228" height="70"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                    </textView>
-                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tkq-9T-iEQ">
-                                        <rect key="frame" x="232" y="7" width="16" height="16"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <state key="normal" backgroundImage="cross"/>
-                                        <connections>
-                                            <action selector="crossBtnAction:" destination="LIL-GJ-tOS" eventType="touchUpInside" id="Rc2-iN-GU8"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </view>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <viewLayoutGuide key="safeArea" id="gAc-fM-MwD"/>
                     </view>
-                    <connections>
-                        <outlet property="containerView" destination="Kke-dh-kb6" id="i0X-Ki-GzL"/>
-                        <outlet property="startBotBtn" destination="Wti-e2-t73" id="hcM-Nm-1Kx"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mDQ-ZR-oiG" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -413,7 +376,7 @@
                                         <rect key="frame" x="0.0" y="612" width="375" height="161"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="3hv-n5-4Nx" id="x1v-s2-3ua">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="161"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="160.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="XJf-w1-aXB">
@@ -520,7 +483,7 @@
                                         <rect key="frame" x="0.0" y="773" width="375" height="250"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="n6e-Y7-99o" id="NWu-Mc-d0F">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="250"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="249.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="100" verticalCompressionResistancePriority="100" translatesAutoresizingMaskIntoConstraints="NO" id="few-aW-4ch">
@@ -614,7 +577,7 @@
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <subviews>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lkd-U8-wAd">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="292" height="1"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="287" height="1"/>
                                                                             <color key="backgroundColor" red="0.89359188079833984" green="0.89359188079833984" blue="0.89411764705882346" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="height" constant="1" id="spt-qn-v0U"/>
@@ -624,7 +587,7 @@
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="It2-kV-Ck3">
-                                                                            <rect key="frame" x="10" y="13.5" width="267" height="21"/>
+                                                                            <rect key="frame" x="10" y="13.5" width="262" height="21"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="height" constant="21" id="Fwp-5j-c4m"/>
                                                                             </constraints>
@@ -816,10 +779,8 @@
         <image name="attachment" width="30" height="30"/>
         <image name="chat-background" width="599" height="852"/>
         <image name="checkbox-blank-circle" width="24" height="24"/>
-        <image name="cross" width="16" height="16"/>
         <image name="doc" width="24" height="24"/>
         <image name="downarrow" width="30" height="30"/>
-        <image name="floating" width="40" height="40"/>
         <image name="images (1)" width="45" height="23"/>
         <image name="leftUser" width="40" height="40"/>
         <image name="menu" width="30" height="30"/>

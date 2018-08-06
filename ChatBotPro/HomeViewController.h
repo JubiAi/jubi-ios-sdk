@@ -13,8 +13,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface HomeViewController : UIViewController
 -(IBAction)crossBtnAction:(id)sender;
 -(IBAction)startBotAction:(id)sender;
-@property(nonatomic, strong)IBOutlet UIView *containerView;
-@property(nonatomic, strong)IBOutlet UIButton *startBotBtn;
+@property(nonatomic, strong) UIView *containerView;
+@property(nonatomic, strong) UITextView *textView;
+@property(nonatomic, strong) UIButton *startBotBtn;
+@property(nonatomic, strong) UIButton *crossBtn;
 @end
 
 NS_ASSUME_NONNULL_END

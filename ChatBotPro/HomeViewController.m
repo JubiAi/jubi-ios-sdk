@@ -18,6 +18,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    [self setFrame];
+    
     _containerView.layer.masksToBounds = YES;
     _containerView.layer.borderColor = [UIColor lightGrayColor].CGColor;
     _containerView.layer.borderWidth = 1.0;
@@ -27,11 +29,39 @@
     _startBotBtn.layer.cornerRadius = 30;
 }
 
--(IBAction)crossBtnAction:(id)sender{
-    _containerView.hidden = YES;
+-(void)setFrame{
+    NSBundle *resourceBundle = [Utility getBundleForChatBotPro];
+    UIImage *img = [UIImage imageNamed:@"floating" inBundle:resourceBundle compatibleWithTraitCollection:nil];
+    _startBotBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_startBotBtn setFrame:CGRectMake(self.view.frame.size.width - 80, self.view.frame.size.height - 70, 60, 60)];
+    [_startBotBtn setBackgroundImage:img forState:UIControlStateNormal];
+    [_startBotBtn addTarget:self action:@selector(startBotAction:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_startBotBtn];
+    
+    _containerView = [[UIView alloc] init];
+    [_containerView setFrame:CGRectMake(self.view.frame.size.width - 276, self.view.frame.size.height - (92+70+10), 256, 92)];
+    [self.view addSubview:_containerView];
+    
+    _textView = [[UITextView alloc] init];
+    [_textView setFrame:CGRectMake(8, 17, 228, 70)];
+    [_textView setBackgroundColor:[UIColor clearColor]];
+    [_textView setEditable:NO];
+    [_textView setText:@"Hi, I can help you find all your answers regarding EarlySalary loans"];
+    [_textView setFont:[UIFont systemFontOfSize:16]];
+    [_containerView addSubview:_textView];
+    
+    UIImage *crossImg = [UIImage imageNamed:@"cross" inBundle:resourceBundle compatibleWithTraitCollection:nil];
+    _crossBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_crossBtn setFrame:CGRectMake(232, 7, 16, 16)];
+    [_crossBtn setBackgroundImage:crossImg forState:UIControlStateNormal];
+    [_crossBtn addTarget:self action:@selector(crossBtnAction:) forControlEvents:UIControlEventTouchUpInside];
+    [_containerView addSubview:_crossBtn];
 }
 
--(IBAction)startBotAction:(id)sender{
+-(void)crossBtnAction:(id)sender{
+    _containerView.hidden = YES;
+}
+-(void)startBotAction:(id)sender{
     NSBundle *resourceBundle = [Utility getBundleForChatBotPro];
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:resourceBundle];
     ViewController *VC = [storyboard instantiateViewControllerWithIdentifier:@"ViewController"];
