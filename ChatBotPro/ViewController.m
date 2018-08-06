@@ -730,7 +730,7 @@
 
 #pragma mark - Service Helper Methods
 -(void)callAPIToSubmitAnswer:(NSString *)message{
-//    [self showProgressCell];
+    [self showProgressCell];
     
     NSString *token = [[NSUserDefaults standardUserDefaults] stringForKey:@"token"];
     NSMutableDictionary * requestDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
