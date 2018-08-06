@@ -383,13 +383,17 @@
 #pragma mark - UITextField Delegate Methode
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField {
-    [self.sendBtn setImage:[UIImage imageNamed:@"sendActive"] forState:UIControlStateNormal];
+    NSBundle *resourceBundle = [Utility getBundleForChatBotPro];
+    UIImage *img = [UIImage imageNamed:@"sendActive.png" inBundle:resourceBundle compatibleWithTraitCollection:nil];
+    [self.sendBtn setImage:img forState:UIControlStateNormal];
 
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
     if ([_messageTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0){
-        [self.sendBtn setImage:[UIImage imageNamed:@"send"] forState:UIControlStateNormal];
+        NSBundle *resourceBundle = [Utility getBundleForChatBotPro];
+        UIImage *img = [UIImage imageNamed:@"send.png" inBundle:resourceBundle compatibleWithTraitCollection:nil];
+       [self.sendBtn setImage:img forState:UIControlStateNormal];
     }
 }
 
@@ -629,7 +633,10 @@
                                                    inSection:0]
          atScrollPosition:UITableViewScrollPositionBottom animated:YES];
        
-        [self.sendBtn setImage:[UIImage imageNamed:@"send"] forState:UIControlStateNormal];
+        
+        NSBundle *resourceBundle = [Utility getBundleForChatBotPro];
+        UIImage *img = [UIImage imageNamed:@"send.png" inBundle:resourceBundle compatibleWithTraitCollection:nil];
+        [self.sendBtn setImage:img forState:UIControlStateNormal];
 
         //send request to bot
         [self callAPIToSubmitAnswer:self.messageTextField.text];
@@ -723,7 +730,7 @@
 
 #pragma mark - Service Helper Methods
 -(void)callAPIToSubmitAnswer:(NSString *)message{
-    [self showProgressCell];
+//    [self showProgressCell];
     
     NSString *token = [[NSUserDefaults standardUserDefaults] stringForKey:@"token"];
     NSMutableDictionary * requestDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
