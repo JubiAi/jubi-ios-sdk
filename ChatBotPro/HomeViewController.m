@@ -25,8 +25,30 @@
     _containerView.layer.borderWidth = 1.0;
     _containerView.layer.cornerRadius = 5.0;
     
+    _containerView.hidden = YES;
     _startBotBtn.layer.masksToBounds = YES;
     _startBotBtn.layer.cornerRadius = 30;
+    
+    UIPanGestureRecognizer *objGesture= [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(moveButton:)];
+    objGesture.delegate = self;
+    [_startBotBtn addGestureRecognizer:objGesture];
+}
+
+-(void)moveButton:(UIPanGestureRecognizer *)recognizer
+{
+    if (recognizer.state == UIGestureRecognizerStateChanged ||
+        recognizer.state == UIGestureRecognizerStateEnded) {
+        
+        UIView *draggedButton = recognizer.view;
+        CGPoint translation = [recognizer translationInView:self.view];
+        
+        CGRect newButtonFrame = draggedButton.frame;
+        newButtonFrame.origin.x += translation.x;
+        newButtonFrame.origin.y += translation.y;
+        draggedButton.frame = newButtonFrame;
+        
+        [recognizer setTranslation:CGPointZero inView:self.view];
+    }
 }
 
 -(void)setFrame{

@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "ChatBotPro"
-  s.version      = "1.0.1"
+  s.version      = "1.0.2"
   s.summary      = "Pod for ChatBotPro."
 
   # This description is used to generate tags and improve search results.
@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
 This pod is created for chatbot
                    DESC
 
-  s.homepage     = "https://github.com/ranapnm123/ChatBotPro"
+  s.homepage     = "https://www.example.com"
   # s.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
 
