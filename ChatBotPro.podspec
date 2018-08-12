@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "ChatBotPro"
-  s.version      = "1.0.2"
+  s.version      = "1.0.3"
   s.summary      = "Pod for ChatBotPro."
 
   # This description is used to generate tags and improve search results.
@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   s.description  = <<-DESC
-This pod is created for chatbot
+	Pod for ChatBot
                    DESC
 
   s.homepage     = "https://www.example.com"
@@ -107,7 +107,7 @@ This pod is created for chatbot
 
   # s.resource  = "icon.png"
   # s.resources = "Resources/*.png"
-    s.resource_bundle = { 'ChatBotPro' => [ 'ChatBotPro/**/*.{png,jpg,storyboard,xib,lproj,xcassets}' ] }
+    s.resource_bundle = { 'ChatBotPro' => [ 'ChatBotPro/**/*.{png,jpg,storyboard,xib,lproj,xcassets,xcdatamodeld}' ] }
     #s.resources = “ChatBotPro/*.storyboard”, “ChatBotPro/*.xcassets” 
 
   # s.preserve_paths = "FilesToSave", "MoreFilesToSave"

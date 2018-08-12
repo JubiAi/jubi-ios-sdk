@@ -31,6 +31,64 @@
     return dataImage;
 }
 
++(NSData *)getreceivedFileInDocDir:(NSString *)strUrl{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    
+    NSString *documentsPath = [paths objectAtIndex:0]; //Get the docs directory
+    documentsPath = [documentsPath stringByAppendingString:@"/Images"];
+    
+    NSError *error;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:documentsPath])
+        [[NSFileManager defaultManager] createDirectoryAtPath:documentsPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+    
+    
+    NSString *fileName = strUrl;
+    
+    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName]; //Add the file name
+    
+    NSData *dataImage = [NSData dataWithContentsOfFile:filePath];
+    
+    return dataImage;
+}
+
++(NSData *)getFileFromTempDir:(NSString *)strUrl{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsPath = [paths objectAtIndex:0]; //Get the docs directory
+    documentsPath = NSTemporaryDirectory() ;
+    
+    NSError *error;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:documentsPath])
+        [[NSFileManager defaultManager] createDirectoryAtPath:documentsPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+    
+    
+    NSString *fileName = [Utility getFileNameFromURL:strUrl];
+    
+    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName]; //Add the file name
+    
+    NSData *dataImage = [NSData dataWithContentsOfFile:filePath];
+    
+    return dataImage;
+}
+
++(NSString *)getFileUrlInDocDir:(NSString *)strUrl{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    
+    NSString *documentsPath = [paths objectAtIndex:0]; //Get the docs directory
+    documentsPath = [documentsPath stringByAppendingString:@"/Images"];
+    
+    NSError *error;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:documentsPath])
+        [[NSFileManager defaultManager] createDirectoryAtPath:documentsPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+    
+    
+    NSString *fileName = [Utility getFileNameFromURL:strUrl];
+    
+    NSString *filePath = [documentsPath stringByAppendingPathComponent:fileName]; //Add the file name
+    
+    
+    return filePath;
+}
+
 +(void)saveFile:(NSString *)strUrl{
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     
@@ -207,4 +265,123 @@
     NSBundle *resourceBundle = [NSBundle bundleWithURL:bundleURL];
     return resourceBundle;
 }
+
++(NSString *)saveImage:(NSData*)imageData withName:(NSString*)imageName
+
+{
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    
+    //Get the docs directory
+    
+    NSString *documentsDirectoryPath = [paths objectAtIndex:0];
+    
+    NSString *folderPath = [documentsDirectoryPath  stringByAppendingPathComponent:@"Images"];  // subDirectory
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:folderPath])
+        
+        [[NSFileManager defaultManager] createDirectoryAtPath:folderPath  withIntermediateDirectories:NO attributes:nil error:nil];
+    
+    
+    
+    //Add the FileName to FilePath
+    
+    NSString *filePath = [folderPath stringByAppendingPathComponent:imageName];
+    
+    //Write the file to documents directory
+    
+    [imageData writeToFile:filePath atomically:YES];
+    
+    return filePath;
+    
+}
+
++(UIImage*)retrieveImage:(NSString*)fileNamewhichtoretrieve
+
+{
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    
+    //Get the docs directory
+    
+    NSString *documentsPath = [paths objectAtIndex:0];
+    
+    
+    
+    NSString *folderPath = [documentsPath   stringByAppendingPathComponent:@"Images"];  // subDirectory
+    
+    
+    
+    NSString *filePath = [folderPath stringByAppendingPathComponent:fileNamewhichtoretrieve];
+    
+    
+    
+    if([[NSFileManager defaultManager] fileExistsAtPath:filePath])
+        
+        return [[UIImage alloc] initWithContentsOfFile:filePath];
+    
+    else
+        
+        return nil;
+    
+}
+
++ (void)removeImage:(NSString *)filename
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    
+    //Get the docs directory
+    
+    NSString *documentsDirectoryPath = [paths objectAtIndex:0];
+    
+    NSString *folderPath = [documentsDirectoryPath  stringByAppendingPathComponent:@"Images"];  // subDirectory
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:folderPath])
+        
+        [[NSFileManager defaultManager] createDirectoryAtPath:folderPath  withIntermediateDirectories:NO attributes:nil error:nil];
+    
+    
+    
+    //Add the FileName to FilePath
+    
+    NSString *filePath = [folderPath stringByAppendingPathComponent:filename];
+    NSError *error;
+    BOOL success = [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
+    if (success) {
+         NSLog(@"Could not delete file -:%@ ",[error localizedDescription]);
+    }
+    else
+    {
+        NSLog(@"Could not delete file -:%@ ",[error localizedDescription]);
+    }
+}
+
++ (BOOL)renameFileFrom:(NSString*)oldName to:(NSString *)newName
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+
+    //Get the docs directory
+    
+    NSString *documentsDirectoryPath = [paths objectAtIndex:0];
+    
+    NSString *folderPath = [documentsDirectoryPath  stringByAppendingPathComponent:@"Images"];  // subDirectory
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:folderPath])
+        
+        [[NSFileManager defaultManager] createDirectoryAtPath:folderPath  withIntermediateDirectories:NO attributes:nil error:nil];
+    
+    NSString *oldPath = [folderPath stringByAppendingPathComponent:oldName];
+    NSString *newPath = [folderPath stringByAppendingPathComponent:newName];
+    
+    NSError *error = nil;
+    if (![[NSFileManager defaultManager] moveItemAtPath:oldPath toPath:newPath error:&error])
+    {
+        NSLog(@"Failed to move '%@' to '%@': %@", oldPath, newPath, [error localizedDescription]);
+        return NO;
+    }
+    return YES;
+}
+
+
+
 @end

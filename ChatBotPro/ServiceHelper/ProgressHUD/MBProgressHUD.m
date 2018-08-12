@@ -107,7 +107,7 @@ static const CGFloat kDetailsLabelFontSize = 15.f;
 
 + (id)showHUDAddedTo:(UIView *)view animated:(BOOL)animated {
 	//MBProgressHUD *hud = [[self alloc] initWithView:view];
-    [[Utility getWindow] setUserInteractionEnabled:NO];
+    [[Utility getWindow] setUserInteractionEnabled:YES];
     ZTTumblrHud *hud = [[ZTTumblrHud alloc] initWithFrame:CGRectMake((CGFloat) (56),
                                                                            (CGFloat) ((view.frame.size.height - 20) * 0.75), 55, 20)];
 //    ZTTumblrHud *hud = [[ZTTumblrHud alloc] initWithFrame:CGRectMake((CGFloat) ((view.frame.size.width - 55) * 0.5),

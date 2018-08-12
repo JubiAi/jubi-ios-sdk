@@ -9,7 +9,7 @@
 #import "HomeViewController.h"
 #import "ViewController.h"
 
-@interface HomeViewController ()
+@interface HomeViewController ()<UIGestureRecognizerDelegate>
 
 @end
 
@@ -24,7 +24,6 @@
     _containerView.layer.borderColor = [UIColor lightGrayColor].CGColor;
     _containerView.layer.borderWidth = 1.0;
     _containerView.layer.cornerRadius = 5.0;
-    
     _containerView.hidden = YES;
     _startBotBtn.layer.masksToBounds = YES;
     _startBotBtn.layer.cornerRadius = 30;
@@ -55,7 +54,7 @@
     NSBundle *resourceBundle = [Utility getBundleForChatBotPro];
     UIImage *img = [UIImage imageNamed:@"floating" inBundle:resourceBundle compatibleWithTraitCollection:nil];
     _startBotBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_startBotBtn setFrame:CGRectMake(self.view.frame.size.width - 80, self.view.frame.size.height - 70, 60, 60)];
+    [_startBotBtn setFrame:CGRectMake(self.view.frame.size.width - 80, self.view.frame.size.height - 120, 60, 60)];
     [_startBotBtn setBackgroundImage:img forState:UIControlStateNormal];
     [_startBotBtn addTarget:self action:@selector(startBotAction:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_startBotBtn];

@@ -24,8 +24,14 @@
 #import "OptionsTableViewCell.h"
 #import "ProgressCell.h"
 #import "AttachmentCell.h"
-
+#import "CoreDataHelper.h"
+#import <AWSS3/AWSS3.h>
+//#import <AWSCore/AWSCore.h>
+#import <MediaPlayer/MediaPlayer.h>
+#import <AVFoundation/AVFoundation.h>
+#import <AVFoundation/AVAsset.h>
 #define kBaseUrl @"https://early-salary-backend.herokuapp.com/ios/JUBI15Q9uk_EarlySalary"
+#define kAWSBucketName @"mobile-dev-jubi"
 
 @interface ViewController ()<UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIDocumentMenuDelegate,UIDocumentPickerDelegate, UIPopoverPresentationControllerDelegate>
 
@@ -59,18 +65,18 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [MagicalRecord setupAutoMigratingCoreDataStack];
+
     [self initialSetup];
     [self setDummyData];
     
     _projectID = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ChatBotProjectID"];
     _baseURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"ChatBotBaseURL"];
     
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        [self.myTableView
-//         scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-//                                                   inSection:0]
-//         atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-//    });
+
+
+        [MagicalRecord enableShorthandMethods];
+        
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(receiveTestNotification:)
@@ -86,11 +92,21 @@
                                              selector:@selector(initialApiCall)
                                                  name:@"initialCallNotification"
                                                object:nil];
+    
+    [self setUpCognitoCredentials];
    
 }
 
+
+
 -(void)initialApiCall{
+    NSArray *dataArr = [Messages MR_findAllSortedBy:@"messageTime" ascending:YES];
+    if(dataArr.count == 0){
      [self callAPIToSubmitAnswer:@"Start over"];
+    }
+    else{
+        [self refreshData];
+    }
 }
 
 - (void) receiveTestNotification:(NSNotification *) notification
@@ -100,23 +116,22 @@
     // as well.
     
     NSLog(@"userInfo %@",notification.object);
+    
+    [self removeProgressCell];
+    
     [self addMessageReplyToArray:notification.object];
-//    [[AlertView sharedManager] displayInformativeAlertwithTitle:@"jkh" andMessage:token onController:self];
     
 }
 
 
 -(void)initialSetup{
     self.messageTextField.delegate = self;
-   // self.messageTextField.layer.borderWidth = 1;
-  //  self.messageTextField.layer.borderColor = [UIColor lightGrayColor].CGColor;
     centerView = self.view.center;
     self.containerView.layer.cornerRadius = 4;
     self.containerView.layer.masksToBounds = true;
     //keyboard notification
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardShow:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardHide:) name:UIKeyboardWillHideNotification object:nil];
-   // self.messageTextField.layer.sublayerTransform = CATransform3DMakeTranslation(5, 0, 0);
     
     self.menuContainerView.layer.cornerRadius = 8;
     self.menuContainerView.layer.masksToBounds = false;
@@ -125,8 +140,7 @@
     self.menuContainerView.layer.shadowOffset = CGSizeMake(0, 1);
     self.menuContainerView.layer.shadowOpacity = 1;
     self.menuContainerView.layer.shadowRadius = 2.0;
-//    self.menuView.layer.borderWidth = 1;
-//    self.menuView.layer.borderColor = [UIColor colorWithRed:(228.0/255.0) green:(228/255.0) blue:(228/255.0) alpha:1.0].CGColor;
+
     self.menuView.layer.cornerRadius = 8;
     self.menuView.clipsToBounds = true;
     self.heightConstant.constant = 0;
@@ -136,39 +150,7 @@
 }
 -(void)setDummyData{
     self.messageList = [[NSMutableArray alloc] init];
-//    MessageInfo *mes = [MessageInfo new];
-//    mes.message = @"This is sender messaage for testing.";
-//    mes.isSender = true;
-//    [self.messageList addObject:mes];
-//
-//    MessageInfo *mes1 = [MessageInfo new];
-//    mes1.message = @"This is reciever messaage for testing. For the purpose of checking multiple line two go in next line.";
-//    mes1.isSender = false;
-//    [self.messageList addObject:mes1];
-//
-//    MessageInfo *mes2 = [MessageInfo new];
-//    mes2.imageName = [UIImage imageNamed:@"pexels-photo"];
-//    mes2.isSender = false;
-//    [self.messageList addObject:mes2];
-//
-//    MessageInfo *mes4 = [MessageInfo new];
-//    mes4.message = @"😎😎😎😎😎";
-//    mes4.isSender = true;
-//    [self.messageList addObject:mes4];
-    
-//    MessageInfo *mes5 = [MessageInfo new];
-//    mes5.message = @"😎😎😎😎😎";
-//    mes5.isCarausal = true;
-//    [self.messageList addObject:mes5];
-   
-//    MessageInfo *mes6 = [MessageInfo new];
-//    mes6.gifImage = @"https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif";
-//    [self.messageList addObject:mes6];
-    
-    
-    
-//    [self.myTableView reloadData];
-    
+
     menuList = [[NSArray alloc] initWithObjects:@"Start over",@"Advantages of EarlySalary loan",@"How can I apply for loan",@"EarlySalary vs CreditCard",@"Interest rate on EarlySalary loans",@"How to repay the loan",@"Talk to agent", @"Cancel conversation",nil];
     
 }
@@ -295,9 +277,19 @@
 -(void)playBtnAction:(UIButton*)sender{
     
     MessageInfo *info = [self.messageList objectAtIndex:sender.tag - 100];
+    
+    NSArray *arr = [[NSString stringWithFormat:@"%@",info.videoURL] componentsSeparatedByString:@"/"];
+    NSString* saveFileName = [arr lastObject];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    documentsDirectory = [documentsDirectory stringByAppendingString:@"/Images"];
+    NSString *path = [documentsDirectory stringByAppendingPathComponent:saveFileName];
+
+    
+    NSURL *vedioURL =[NSURL fileURLWithPath:[NSString stringWithFormat:@"%@",path]];
     if (info.videoURL != nil) {
         AVPlayerViewController *playerViewController = [[AVPlayerViewController alloc] init];
-        playerViewController.player = [AVPlayer playerWithURL:info.videoURL];
+        playerViewController.player = [AVPlayer playerWithURL:vedioURL];
         [self presentViewController:playerViewController animated:YES completion:nil];
     }
    
@@ -307,45 +299,102 @@
 
 
 #pragma mark - UIImagePicker Delegate
+
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
     NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
-    
-    if ([mediaType isEqualToString:@"public.image"]) {
-        
-        UIImage *chosenImage = info[UIImagePickerControllerOriginalImage];
-        MessageInfo *info1 = [MessageInfo new];
-        info1.imageName = chosenImage;
-        info1.isSender = true;
-        [self.messageList addObject:info1];
-        
-    } else if ([mediaType isEqualToString:@"public.movie"]){
-        
-        NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
+    if (@available(iOS 11.0, *)) {
+        NSURL *imageURL;
+        if ([mediaType isEqualToString:@"public.image"]) {
+            UIImage *chosenImage = info[UIImagePickerControllerOriginalImage];
+            if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
+                NSString *fileName = [NSString stringWithFormat:@"%@.jpg",[NSDate date]];
+                fileName = [Utility getFileNameFromURL:fileName];
+   
+                NSData * imageData = UIImageJPEGRepresentation(chosenImage, .5);
+                NSString *filePath = [Utility saveImage:imageData withName:fileName];
+                imageURL = [NSURL URLWithString:filePath];
+                
+            }
+            else{
+                NSString *fileName = [NSString stringWithFormat:@"%@.jpg",[NSDate date]];
+                fileName = [Utility getFileNameFromURL:fileName];
+                NSData * imageData = UIImageJPEGRepresentation(chosenImage, .5);
+                NSString *filePath = [Utility saveImage:imageData withName:fileName];
+                imageURL = [NSURL URLWithString:filePath];
 
-        AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
-        AVAssetImageGenerator *gen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
-        gen.appliesPreferredTrackTransform = YES;
-        CMTime time = CMTimeMakeWithSeconds(0.0, 600);
-        NSError *error = nil;
-        CMTime actualTime;
-        
-        CGImageRef image = [gen copyCGImageAtTime:time actualTime:&actualTime error:&error];
-        UIImage *thumbnail = [[UIImage alloc] initWithCGImage:image];
-        CGImageRelease(image);
 
-        MessageInfo *info1 = [MessageInfo new];
-        info1.thumbnailImage = thumbnail;
-        info1.videoURL = videoURL;
-        info1.isSender = true;
-        [self.messageList addObject:info1];
+            }
+            
+            
+            
+            MessageInfo *info1 = [MessageInfo new];
+            info1.imageName = chosenImage;
+            info1.fileNameStr = [imageURL lastPathComponent];
+            info1.gifImage = [NSString stringWithFormat:@"%@",imageURL];
+            info1.isSender = true;
+
+            
+            ///save sent message to local db
+            [CoreDataHelper saveSentMessageDataTolocalDB:info1];
+
+            [self.messageList addObject:info1];
+            
+            [self addMessageToTableView];
+            
+
+
+            [self uploadFileToServer:info1];
+            
+        } else if ([mediaType isEqualToString:@"public.movie"]){
+            
+            NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
+            
+            
+            AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
+            AVAssetImageGenerator *gen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+            gen.appliesPreferredTrackTransform = YES;
+            CMTime time = CMTimeMakeWithSeconds(0.0, 600);
+            NSError *error = nil;
+            CMTime actualTime;
+
+            CGImageRef image = [gen copyCGImageAtTime:time actualTime:&actualTime error:&error];
+            UIImage *thumbnail = [[UIImage alloc] initWithCGImage:image];
+            CGImageRelease(image);
+            
+            //for thumbnail
+            NSString *fileName2 = [NSString stringWithFormat:@"%@_thumbnail.jpg",[NSDate date]];
+            fileName2 = [Utility getFileNameFromURL:fileName2];
+            NSData * imageData2 = UIImageJPEGRepresentation(thumbnail, .5);
+            NSString *filePath2 = [Utility saveImage:imageData2 withName:fileName2];
+            NSURL *thumbnailImgUrl = [NSURL URLWithString:fileName2];
+            ///end///
+            
+            
+            NSString *fileName = [NSString stringWithFormat:@"%@.MOV",[NSDate date]];
+            fileName = [Utility getFileNameFromURL:fileName];
+            NSData * imageData = [NSData dataWithContentsOfURL:videoURL];
+            NSString *filePath = [Utility saveImage:imageData withName:fileName];
+            imageURL = [NSURL URLWithString:filePath];
+
+            MessageInfo *info1 = [MessageInfo new];
+            info1.thumbnailImage = thumbnailImgUrl;
+            info1.fileNameStr = imageURL.lastPathComponent;
+            info1.videoURL = imageURL;
+            info1.isSender = true;
+            ///save sent message to local db
+            [CoreDataHelper saveSentMessageDataTolocalDB:info1];
+            
+            [self.messageList addObject:info1];
+            
+            [self addMessageToTableView];
+            
+            [self uploadFileToServer:info1];
+        }
+    } else {
+        // Fallback on earlier versions
     }
     
-    [self.myTableView reloadData];
-    [self.myTableView
-     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-                                               inSection:0]
-     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
     [picker dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -365,19 +414,19 @@
     NSLog(@"picked %@", url);
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     NSLog(@"extenstion %@", [request.URL lastPathComponent]);
-    //UIImage *thumbnail = [UIImage imageNamed:@"document"];
     MessageInfo *info1 = [MessageInfo new];
     info1.videoURL = url;
     info1.message = [request.URL lastPathComponent];
     info1.isDoc = true;
     info1.isSender = true;
+    
+    ///save sent message to local db
+    [CoreDataHelper saveSentMessageDataTolocalDB:info1];
+    //
     [self.messageList addObject:info1];
     
-    [self.myTableView reloadData];
-    [self.myTableView
-     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-                                               inSection:0]
-     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    [self addMessageToTableView];
+
 }
 
 #pragma mark - UITextField Delegate Methode
@@ -416,6 +465,10 @@
 }
 
 #pragma mark - UITableViewDelegate & DataSource Methods
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     if (tableView == self.menuTableView) {
         return menuList.count;
@@ -425,6 +478,11 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     if(tableView == self.myTableView){
+        MessageInfo *info = [self.messageList objectAtIndex:indexPath.row];
+        if(info.isDoc){
+            NSURL *fileUrl = info.videoURL;
+            NSData *data = [NSData dataWithContentsOfURL:fileUrl];
+        }
         return;
     }
     [UIView animateWithDuration:0.85 delay:0 options:UIViewAnimationOptionCurveLinear  animations:^{
@@ -435,18 +493,9 @@
         //code for completion
     }];
     self.menuBtn.selected = false;
-//    MessageInfo *info = [MessageInfo new];
-//    info.message = [menuList objectAtIndex:indexPath.row];
-//    info.isSender = true;
-//    [self.messageList addObject:info];
-//    [self.myTableView reloadData];
-//    [self.myTableView
-//     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-//                                               inSection:0]
-//     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+
 //    
 //    //send request to bot
-//    [self callAPIToSubmitAnswer:[menuList objectAtIndex:indexPath.row]];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"collectionCellButtonActionNotification" object:[menuList objectAtIndex:indexPath.row]];
 }
 
@@ -466,94 +515,134 @@
         return cell;
     }
     
-    
-    if (info.thumbnailImage != nil) {
-        SenderImageTableViewCell *cell = (SenderImageTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"SenderImageTableViewCell"];
-                cell.playBtn.hidden = false;
-        cell.playBtn.tag = indexPath.row + 100;
-            [cell.playBtn addTarget:self action:@selector(playBtnAction:) forControlEvents:UIControlEventTouchUpInside];
-
-        
-        cell.messageImageView.image = info.thumbnailImage;
-        return cell;
-    }
-    if(info.isDoc){
-        AttachmentCell *cell = (AttachmentCell*)[tableView dequeueReusableCellWithIdentifier:@"AttachmentCell"];
-        cell.messageTitle.text = info.message;
-        return cell;
-    }
-    
-    if (info.gifImage.length > 0) {
-        ImageReceiverTableViewCell *cell = (ImageReceiverTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"ImageReceiverTableViewCell"];
-        
-        NSURL *url = [NSURL URLWithString:info.gifImage];
-        
-        
-        NSData *fileData = [Utility getFileInDocDir:info.gifImage];
-        if(fileData != nil){
-            cell.messageImageView.image = [UIImage animatedImageWithAnimatedGIFData:fileData];
-        }
-        else{
-        
-//        cell.messageImageView.image = [UIImage imageNamed:@"messageplaceholder"];
-        
-        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
-        dispatch_async(queue, ^{
-            [Utility saveFile:info.gifImage];
-            NSData * imageData = [NSData dataWithContentsOfURL:url];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                 cell.messageImageView.image = [UIImage animatedImageWithAnimatedGIFData:imageData];
-            });
-        });
-        }
-        return cell;
-        
-    }
-    
-    if (info.isCarausal) {
-        CollectionViewTableViewCell *cell = (CollectionViewTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"CollectionViewTableViewCell"];
-        cell.myCollectionView.delegate = cell;
-        cell.myCollectionView.dataSource = cell;
-        NSArray *articleData = info.carausalArray;
-        [cell setCollectionData:articleData];
-        return cell;
-    }
-    
-    if (info.isOption) {
-        OptionsTableViewCell *cell = (OptionsTableViewCell *)[tableView dequeueReusableCellWithIdentifier:@"OptionsTableViewCell"];
-        [cell setData:info.optionsArray];
-        return cell;
-    }
+ 
     
     if (info.isSender) {
-        if (info.imageName == nil) {
+        
+        if (info.message.length > 0 && info.isDoc == false) {
             SenderTableViewCell *cell = (SenderTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"SenderTableViewCell"];
             cell.messageLabel.text = info.message;
             
             return cell;
-        }else{
+        }
+        
+        else if (info.gifImage.length > 0 ) {
             SenderImageTableViewCell *cell = (SenderImageTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"SenderImageTableViewCell"];
             cell.playBtn.hidden = true;
-            cell.messageImageView.image = info.imageName;
+            UIImage *img = [UIImage imageWithContentsOfFile:info.gifImage];
+            if(img == nil){
+                NSArray *arr = [info.gifImage componentsSeparatedByString:@"/"];
+                NSString *imgName = [arr lastObject];
+                NSData *dt = [Utility getreceivedFileInDocDir:imgName];
+                img = [UIImage imageWithData:dt];
+            }
+            
+            cell.messageImageView.image = img;
+
             UIButton *imgBtn = [UIButton buttonWithType:UIButtonTypeCustom];
             imgBtn.frame = cell.messageImageView.frame;
             imgBtn.tag = indexPath.row + 300;;
             [imgBtn addTarget:self action:@selector(imageBtnTapped:) forControlEvents:UIControlEventTouchUpInside];
             [cell.contentView addSubview:imgBtn];
             return cell;
+            
+            
         }
+        
+       else if(info.isDoc){
+            AttachmentCell *cell = (AttachmentCell*)[tableView dequeueReusableCellWithIdentifier:@"AttachmentCell"];
+            cell.messageTitle.text = info.message;
+            return cell;
+        }
+        
+        else if (info.videoURL != nil) {
+            SenderImageTableViewCell *cell = (SenderImageTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"SenderImageTableViewCell"];
+            cell.playBtn.hidden = false;
+            
+            
+            
+            
+            NSURL *videoURL = info.videoURL;
+            
+           
+            UIImage *thumbnail = [Utility retrieveImage:[NSString stringWithFormat:@"%@",info.thumbnailImage]];
+
+            UIButton *imgBtn2 = (UIButton *)[self.view viewWithTag:indexPath.row + 300];
+            [imgBtn2  removeFromSuperview];
+            
+            UIButton *imgBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+            imgBtn.frame = cell.messageImageView.frame;
+            imgBtn.tag = indexPath.row + 100;;
+            [imgBtn addTarget:self action:@selector(playBtnAction:) forControlEvents:UIControlEventTouchUpInside];
+            
+            [cell.contentView addSubview:imgBtn];
+//            cell.playBtn.tag = indexPath.row + 100;
+//            [cell.playBtn addTarget:self action:@selector(playBtnAction:) forControlEvents:UIControlEventTouchUpInside];
+            
+            
+            cell.messageImageView.image = thumbnail;
+            return cell;
+        }
+     
     }else {
-        if (info.imageName == nil) {
+        if (info.message.length>0) {
             ReciverTableViewCell *cell = (ReciverTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"ReciverTableViewCell"];
             cell.messageTitle.text = info.message;
             return cell;
-        }else{
-            ImageReceiverTableViewCell *cell = (ImageReceiverTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"ImageReceiverTableViewCell"];
-            cell.messageImageView.image = info.imageName;
-            
+        }
 
+        
+        if (info.gifImage.length > 0) {
+            ImageReceiverTableViewCell *cell = (ImageReceiverTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"ImageReceiverTableViewCell"];
+            
+            NSURL *url = [NSURL URLWithString:info.gifImage];
+            
+            
+            NSData *fileData = [Utility getFileInDocDir:info.gifImage];
+            if(fileData != nil){
+                cell.messageImageView.image = [UIImage animatedImageWithAnimatedGIFData:fileData];
+            }
+            else{
+                
+                
+                dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
+                dispatch_async(queue, ^{
+                    NSData * imageData = [NSData dataWithContentsOfURL:url];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        cell.messageImageView.image = [UIImage animatedImageWithAnimatedGIFData:imageData];
+                    });
+                });
+            }
+            
+            UIButton *imgBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+            imgBtn.frame = cell.messageImageView.frame;
+            imgBtn.tag = indexPath.row + 300;;
+            [imgBtn addTarget:self action:@selector(imageBtnTapped:) forControlEvents:UIControlEventTouchUpInside];
+            [cell.contentView addSubview:imgBtn];
+            
+            return cell;
+            
+        }
+        
+        if (info.isCarausal) {
+            CollectionViewTableViewCell *cell = (CollectionViewTableViewCell*)[tableView dequeueReusableCellWithIdentifier:@"CollectionViewTableViewCell"];
+            cell.myCollectionView.delegate = cell;
+            cell.myCollectionView.dataSource = cell;
+            NSArray *articleData = info.carausalArray;
+            [cell setCollectionData:articleData];
             return cell;
         }
+        
+        if (info.isOption) {
+            OptionsTableViewCell *cell = (OptionsTableViewCell *)[tableView dequeueReusableCellWithIdentifier:@"OptionsTableViewCell"];
+            [cell setData:info.optionsArray];
+            return cell;
+        }
+        
+
+      
+        
+       
     }
     
     
@@ -562,8 +651,17 @@
 
 -(void)imageBtnTapped:(UIButton *)sender{
     MessageInfo *info = [self.messageList objectAtIndex:sender.tag - 300];
-    UIImage *image = info.imageName;
-    
+    UIImage *image = [UIImage imageWithContentsOfFile:info.gifImage];
+    if(image == nil){
+    NSArray *arr = [info.gifImage componentsSeparatedByString:@"/"];
+    NSString *imgName = [arr lastObject];
+    NSData *dt = [Utility getreceivedFileInDocDir:imgName];
+    image = [UIImage imageWithData:dt];
+    }
+    if(!info.isSender){
+        NSData *fileData = [Utility getFileInDocDir:info.gifImage];
+        image = [UIImage animatedImageWithAnimatedGIFData:fileData];
+    }
     _previewImage = [[UIImageView alloc] initWithImage:image];
     _previewImage.frame = self.view.bounds;
     _previewImage.contentMode = UIViewContentModeScaleAspectFill;
@@ -612,12 +710,8 @@
     MessageInfo *info = [MessageInfo new];
     info.message = @"Read more";
     info.isSender = true;
-    [self.messageList addObject:info];
-    [self.myTableView reloadData];
-    [self.myTableView
-     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-                                               inSection:0]
-     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    [self saveMessageDataTolocalDB:info];
+
 }
 
 - (IBAction)sendBtnAction:(id)sender {
@@ -626,13 +720,15 @@
         MessageInfo *info = [MessageInfo new];
         info.message = self.messageTextField.text;
         info.isSender = true;
+        
+        ///save sent message to local db
+        [CoreDataHelper saveSentMessageDataTolocalDB:info];
+        
         [self.messageList addObject:info];
-        [self.myTableView reloadData];
-        [self.myTableView
-         scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-                                                   inSection:0]
-         atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-       
+        
+        [self addMessageToTableView];
+        
+
         
         NSBundle *resourceBundle = [Utility getBundleForChatBotPro];
         UIImage *img = [UIImage imageNamed:@"send.png" inBundle:resourceBundle compatibleWithTraitCollection:nil];
@@ -665,25 +761,7 @@
     }
     
     
-//        // grab the view controller we want to show
-//        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//        UIViewController *controller = [storyboard instantiateViewControllerWithIdentifier:@"MenuViewController"];
-//        
-//    // set modal presentation style to popover on your view controller
-//    // must be done before you reference controller.popoverPresentationController
-//    controller.modalPresentationStyle = UIModalPresentationPopover;
-//    controller.preferredContentSize = CGSizeMake(270, 360);
-//    
-//    // configure popover style & delegate
-//    UIPopoverPresentationController *popover =  controller.popoverPresentationController;
-//    popover.delegate = self;
-//    popover.sourceView = self.menuBtn;
-//    popover.sourceRect = CGRectMake(0+13,0,self.menuBtn.frame.size.width,self.menuBtn.frame.size.height);
-//    popover.permittedArrowDirections = UIPopoverArrowDirectionDown;
-//    
-//    // display the controller in the usual way
-//    [self presentViewController:controller animated:YES completion:nil];
-//    
+
 }
 - (UIModalPresentationStyle)adaptivePresentationStyleForPresentationController:(UIPresentationController *)controller {
     
@@ -713,33 +791,64 @@
     info.isSender = false;
     info.isProgress = YES;
     [self.messageList addObject:info];
-    [self.myTableView reloadData];
+    
+    [self addMessageToTableView];
+   
+}
+
+-(void)addMessageToTableView{
+    dispatch_async(dispatch_get_main_queue(), ^{
+    [self.myTableView beginUpdates];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.messageList.count-1 inSection:0];
+    [self.myTableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+    [self.myTableView endUpdates];
+    
     [self.myTableView
      scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
                                                inSection:0]
      atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    });
 }
 
 -(void)removeProgressCell{
     for(MessageInfo *info in self.messageList){
         if (info.isProgress) {
-            [self.messageList removeObject:info];
+             [self.messageList removeObject:info];
+            [self.myTableView beginUpdates];
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.messageList.count inSection:0];
+            [self.myTableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            [self.myTableView endUpdates];
+            
+            if(self.messageList.count > 0){
+            [self.myTableView
+             scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
+                                                       inSection:0]
+             atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+            }
         }
     }
 }
 
 #pragma mark - Service Helper Methods
 -(void)callAPIToSubmitAnswer:(NSString *)message{
-    [self showProgressCell];
+    double delayInSeconds = .5;
+    
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
+                   {
+                       [self showProgressCell];
+                       
+                   });
+    
     
     NSString *token = [[NSUserDefaults standardUserDefaults] stringForKey:@"token"];
+    
     NSMutableDictionary * requestDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                          message, @"lastAnswer",
                                          token, @"iosId",_projectID,@"projectId",nil];
 
     [[OPServiceHelper sharedServiceHelper] PostAPICallWithParameter:requestDict apiName:_baseURL methodName:WebMethodLogin WithComptionBlock:^(id result, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self removeProgressCell];
             if(!error){
                 if([[result objectForKeyNotNull:pRESPONSE_CODE expectedObj:@"0"] integerValue] == 200){
                     
@@ -753,26 +862,28 @@
     }];
 }
 
--(void)addInfo:(NSDictionary*)dict{
-    MessageInfo *info = [MessageInfo new];
-    if([[dict objectForKey:@"type"] isEqualToString:@"text"]){
-        info.message = [dict objectForKey:@"value"];
-    }
-    else if([[dict objectForKey:@"type"] isEqualToString:@"image"]){
-        info.gifImage = [dict objectForKey:@"value"];
-    }
-    info.isSender = false;
-    if(info.message.length != 0 || info.gifImage.length != 0)
-    [self.messageList addObject:info];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // Your UI update code here
-        [self.myTableView reloadData];
-        [self.myTableView
-         scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-                                                   inSection:0]
-         atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-    });
-   
+-(void)callAPIToSubmitAttachment:(NSString *)url{
+    [self showProgressCell];
+    
+    NSString *token = [[NSUserDefaults standardUserDefaults] stringForKey:@"token"];
+    NSMutableDictionary * requestDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                         @"attachment", @"type",url,@"url",
+                                         token, @"iosId",@"JUBI15Q9uk_EarlySalary",@"projectId",nil];
+    
+    [[OPServiceHelper sharedServiceHelper] PostAPICallWithParameter:requestDict apiName:_baseURL methodName:WebMethodLogin WithComptionBlock:^(id result, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self removeProgressCell];
+            if(!error){
+                if([[result objectForKeyNotNull:pRESPONSE_CODE expectedObj:@"0"] integerValue] == 200){
+                    
+                    
+                    
+                } else{
+                    
+                }
+            }
+        });
+    }];
 }
 
 -(void)addMessageReplyToArray:(NSDictionary *)messageDict{
@@ -800,6 +911,10 @@
     else if([[messageDict objectForKey:@"answerType"] isEqualToString:@"generic"]){
         id object = [self dictionaryFromString:[messageDict objectForKey:@"botMessage"]];
         
+        ///added delay because want to save bot messages first
+        id optionsObject = [self dictionaryFromString:[messageDict objectForKey:@"options"]];
+        [self performSelector:@selector(addCaraousalOptionsToArray:) withObject:optionsObject afterDelay:3.0];
+        
         if ([object isKindOfClass:[NSArray class]]) {
             NSLog(@"arrclass");
             double delayInSeconds = 0.0;
@@ -812,20 +927,12 @@
                                    [self performSelectorOnMainThread:@selector(addInfo:)
                                                           withObject:dict
                                                        waitUntilDone:NO];
-                                   if ([object lastObject] == dict) {
-                                       id optionsObject = [self dictionaryFromString:[messageDict objectForKey:@"options"]];
-                                       [self addCaraousalOptionsToArray:optionsObject];
-                                   }
+//                                   if ([object lastObject] == dict) {
+//                                       id optionsObject = [self dictionaryFromString:[messageDict objectForKey:@"options"]];
+//                                       [self addCaraousalOptionsToArray:optionsObject];
+//                                   }
                                });
-//                MessageInfo *info = [MessageInfo new];
-//                info.message = [dict objectForKey:@"value"];
-//                info.isSender = false;
-//                [self.messageList addObject:info];
-//                [self.myTableView reloadData];
-//                [self.myTableView
-//                 scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-//                                                           inSection:0]
-//                 atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+
                 NSLog(@"done with for loop");
             }
         }
@@ -834,6 +941,11 @@
     }
     else if([[messageDict objectForKey:@"answerType"] isEqualToString:@"option"]){
         id object = [self dictionaryFromString:[messageDict objectForKey:@"botMessage"]];
+        
+        ///added delay because want to save bot messages first
+         id optionsObject = [self dictionaryFromString:[messageDict objectForKey:@"options"]];
+        [self performSelector:@selector(addTempOptionsToArray:) withObject:optionsObject afterDelay:3.0];
+        
         if ([object isKindOfClass:[NSArray class]]) {
             NSLog(@"arrclass");
             double delayInSeconds = 0.0;
@@ -843,35 +955,146 @@
                 dispatch_after(popTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
                                {
                                    NSLog(@"Block");
-                                   [self performSelectorOnMainThread:@selector(addInfo:)
+                                   [self performSelectorOnMainThread:@selector(addInfo2:)
                                                           withObject:dict
                                                        waitUntilDone:NO];
-                                   if ([object lastObject] == dict) {
-                                       id optionsObject = [self dictionaryFromString:[messageDict objectForKey:@"options"]];
-                                       [self addTempOptionsToArray:optionsObject];
-                                   }
+
                                });
-//                MessageInfo *info = [MessageInfo new];
-//                if([[dict objectForKey:@"type"] isEqualToString:@"text"]){
-//                info.message = [dict objectForKey:@"value"];
-//                }
-//                else if([[dict objectForKey:@"type"] isEqualToString:@"image"]){
-//                    info.gifImage = [dict objectForKey:@"value"];
-//                }
-//                info.isSender = false;
-//                if(info.message.length != 0 || info.gifImage.length != 0)
-//                [self.messageList addObject:info];
-//                [self.myTableView reloadData];
-//                [self.myTableView
-//                 scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-//                                                           inSection:0]
-//                 atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+
                 
             }
         }
        
        
     }
+}
+
+-(void)saveMessageDataTolocalDB:(MessageInfo *)msgInfo{
+    //Save to persistant storage
+        [MagicalRecord saveWithBlock:^(NSManagedObjectContext *localContext){
+        Messages *message = [Messages MR_createEntityInContext:localContext];
+        message.message = msgInfo.message;
+        message.descriptionStr = msgInfo.descriptionStr;
+        
+        message.videoURL = [NSString stringWithFormat:@"%@",msgInfo.videoURL];
+            if(msgInfo.gifImage.length == 0){
+            message.imageName = msgInfo.gifImage;
+            }
+            else{
+        message.gifImage = msgInfo.gifImage;
+            }
+            
+            if(msgInfo.carausalArray.count>0){
+                    message.carausalArrayData = [NSKeyedArchiver archivedDataWithRootObject:msgInfo.carausalArray];
+            }
+            
+            if(msgInfo.optionsArray.count>0){
+                
+                    message.optionsArrayData = [NSKeyedArchiver archivedDataWithRootObject:msgInfo.optionsArray];
+            }
+        message.isSender = msgInfo.isSender;
+        message.isCarausal = msgInfo.isCarausal;
+        message.isOption = msgInfo.isOption;
+        message.isProgress = msgInfo.isProgress;
+        message.isDoc = msgInfo.isDoc;
+        message.messageTime = [NSDate date];
+        
+        }
+                  completion:^(BOOL success, NSError *error){
+                      
+                      [self refreshData];
+                  }];
+}
+
+
+-(void) refreshData
+{
+    [self.messageList removeAllObjects];
+    NSArray *allRecords = [Messages MR_findAllSortedBy:@"messageTime" ascending:YES];
+    if (allRecords.count == 0) {
+        return;
+    }
+    for (Messages *message in allRecords){
+            NSLog(@"messagetime %@",message.messageTime);
+        MessageInfo *msgInfo = [MessageInfo new];
+         msgInfo.message = message.message ;
+        msgInfo.descriptionStr = message.descriptionStr ;
+        
+        NSString *val = message.thumbnailImage;
+        if(![val isEqual:@"(null)"])
+        msgInfo.thumbnailImage =   [NSURL URLWithString:message.thumbnailImage];
+        
+        NSString *val2 = message.videoURL;
+        if(![val2 isEqual:@"(null)"])
+        msgInfo.videoURL = [NSURL URLWithString:message.videoURL];
+        
+        msgInfo.gifImage = message.gifImage ;
+        if(message.carausalArrayData != 0){
+            msgInfo.carausalArray = [NSKeyedUnarchiver unarchiveObjectWithData:message.carausalArrayData];
+        }
+        if(message.optionsArrayData != 0){
+            msgInfo.optionsArray = [NSKeyedUnarchiver unarchiveObjectWithData:message.optionsArrayData];
+        }
+        msgInfo.isSender = message.isSender ;
+        msgInfo.isCarausal = message.isCarausal;
+        msgInfo.isOption = message.isOption;
+        msgInfo.isProgress = message.isProgress;
+        msgInfo.isDoc = message.isDoc;
+        msgInfo.messageTime = message.messageTime;
+        [self.messageList addObject:msgInfo];
+    }
+    [self.myTableView reloadData];
+    [self.myTableView
+     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
+                                               inSection:0]
+     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+}
+
+
+-(void)addInfo:(NSDictionary*)dict{
+    MessageInfo *info = [MessageInfo new];
+    if([[dict objectForKey:@"type"] isEqualToString:@"text"]){
+        info.message = [dict objectForKey:@"value"];
+    }
+    else if([[dict objectForKey:@"type"] isEqualToString:@"image"]){
+        info.gifImage = [dict objectForKey:@"value"];
+        [Utility saveFile:info.gifImage];
+    }
+    info.messageId = [[dict objectForKey:@"id"] intValue];
+    info.isSender = false;
+    if(info.message.length != 0 || info.gifImage.length != 0){
+        ///save sent message to local db
+        [CoreDataHelper saveSentMessageDataTolocalDB:info];
+        
+        [self.messageList addObject:info];
+        
+        [self addMessageToTableView];
+
+    }
+
+}
+
+-(void)addInfo2:(NSDictionary*)dict{
+    MessageInfo *info = [MessageInfo new];
+    if([[dict objectForKey:@"type"] isEqualToString:@"text"]){
+        info.message = [dict objectForKey:@"value"];
+    }
+    else if([[dict objectForKey:@"type"] isEqualToString:@"image"]){
+        info.gifImage = [dict objectForKey:@"value"];
+        [Utility saveFile:info.gifImage];
+    }
+    info.messageId = [[dict objectForKey:@"id"] intValue];
+    info.isSender = false;
+    if(info.message.length != 0 || info.gifImage.length != 0){
+        ///save sent message to local db
+        [CoreDataHelper saveSentMessageDataTolocalDB:info];
+        
+        [self.messageList addObject:info];
+        
+        [self addMessageToTableView];
+        
+    }
+   
 }
 
 -(void)addCaraousalOptionsToArray:(id)options{
@@ -881,16 +1104,14 @@
     if ([options isKindOfClass:[NSArray class]]) {
         info2.carausalArray = options;
     }
-    [self.messageList addObject:info2];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // Your UI update code here
-        [self.myTableView reloadData];
-        [self.myTableView
-         scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-                                                   inSection:0]
-         atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-    });
+    ///save sent message to local db
+    [CoreDataHelper saveSentMessageDataTolocalDB:info2];
     
+    [self.messageList addObject:info2];
+    
+    [self addMessageToTableView];
+    
+
     
 }
 
@@ -906,14 +1127,13 @@
             
         }
         info.optionsArray = tempArr;
+        ///save sent message to local db
+        [CoreDataHelper saveSentMessageDataTolocalDB:info];
+        
         [self.messageList addObject:info];
-        dispatch_async(dispatch_get_main_queue(), ^{
-        [self.myTableView reloadData];
-        [self.myTableView
-         scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-                                                   inSection:0]
-         atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-            });
+        
+        [self addMessageToTableView];
+
     }
     
 }
@@ -942,16 +1162,12 @@
         }
     }
     
-    NSLog(@"userInfo %@",notification.object);
+//    NSLog(@"userInfo %@",notification.object);
     MessageInfo *info = [MessageInfo new];
     info.message = notification.object;
     info.isSender = true;
-    [self.messageList addObject:info];
-    [self.myTableView reloadData];
-    [self.myTableView
-     scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
-                                               inSection:0]
-     atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    [self saveMessageDataTolocalDB:info];
+
     
     [self performSelector:@selector(callApi:) withObject:notification.object afterDelay:1];
     
@@ -961,6 +1177,117 @@
     
     [self callAPIToSubmitAnswer:text];
 }
+
+#pragma mark - AWS3 file upload methods
+-(void)setUpCognitoCredentials{
+    AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc] initWithRegionType:AWSRegionAPSouth1 identityPoolId:@"ap-south-1:392c5499-a210-4b1d-b55a-b170cd1cd7fa"];
+    AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:AWSRegionAPSouth1 credentialsProvider:credentialsProvider];
+    AWSServiceManager.defaultServiceManager.defaultServiceConfiguration = configuration;
+}
+
+-(void)uploadFileToServer:(MessageInfo *)info{
+    NSURL *uploadingFileURL;
+    if(info.videoURL != nil || info.isDoc == YES){
+        uploadingFileURL = info.videoURL;
+    }
+    if(info.gifImage.length>0){
+        uploadingFileURL = [NSURL URLWithString:info.gifImage];
+    }
+    AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
+    
+    AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
+    [uploadRequest setACL:AWSS3ObjectCannedACLPublicRead];
+    uploadRequest.bucket = kAWSBucketName;
+    uploadRequest.key = info.fileNameStr;
+    uploadRequest.body = uploadingFileURL;
+    
+    
+    
+    
+    [[transferManager upload:uploadRequest] continueWithExecutor:[AWSExecutor mainThreadExecutor]
+                                                       withBlock:^id(AWSTask *task) {
+                                                           if (task.error) {
+                                                               if ([task.error.domain isEqualToString:AWSS3TransferManagerErrorDomain]) {
+                                                                   switch (task.error.code) {
+                                                                       case AWSS3TransferManagerErrorCancelled:
+                                                                       case AWSS3TransferManagerErrorPaused:
+                                                                           break;
+                                                                           
+                                                                       default:
+                                                                           NSLog(@"Error: %@", task.error);
+                                                                           break;
+                                                                   }
+                                                               } else {
+                                                                   // Unknown error.
+                                                                   NSLog(@"Error: %@", task.error);
+                                                               }
+                                                           }
+                                                           
+                                                           if (task.result) {
+                                                               AWSS3TransferManagerUploadOutput *uploadOutput = task.result;
+                                                               
+                                                               
+                                                               NSString *s3URL = [NSString stringWithFormat:@"https://s3-ap-south-1.amazonaws.com/%@/%@",kAWSBucketName,info.fileNameStr];
+                                                               NSLog(@"%@, The file uploaded successfully.",s3URL);
+                                                               
+//                                                               [Utility removeImage:info.fileNameStr];
+//                                                               [Utility saveFile:s3URL];
+//                                                               
+//                                                              [CoreDataHelper updateMessageDataTolocalDBFrom:info.gifImage to:s3URL];
+//                                                               MessageInfo *newInfo = info;
+//                                                               newInfo.message = @"";
+//                                                               if(newInfo.gifImage.length>0){
+//                                                               newInfo.gifImage = [NSString stringWithFormat:@"%@",s3URL];
+//                                                               }
+//                                                               else{
+//                                                                   newInfo.videoURL = [NSURL URLWithString:s3URL];
+//                                                               }
+                                                               
+                                                               [self callAPIToSubmitAttachment:s3URL];
+//                                                               NSURL *downloadingFileURL = [NSURL URLWithString:s3URL];
+//
+//                                                               AWSS3TransferManagerDownloadRequest *downloadRequest = [AWSS3TransferManagerDownloadRequest new];
+//
+//                                                               downloadRequest.bucket = uploadRequest.bucket;
+//                                                               downloadRequest.key = uploadRequest.key;
+//                                                               downloadRequest.downloadingFileURL = downloadingFileURL;
+//                                                               [[transferManager download:downloadRequest ] continueWithExecutor:[AWSExecutor mainThreadExecutor]
+//                                                                                                                       withBlock:^id(AWSTask *task) {
+//                                                                                                                           if (task.error){
+//                                                                                                                               if ([task.error.domain isEqualToString:AWSS3TransferManagerErrorDomain]) {
+//                                                                                                                                   switch (task.error.code) {
+//                                                                                                                                       case AWSS3TransferManagerErrorCancelled:
+//                                                                                                                                       case AWSS3TransferManagerErrorPaused:
+//                                                                                                                                           break;
+//
+//                                                                                                                                       default:
+//                                                                                                                                           NSLog(@"Error: %@", task.error);
+//                                                                                                                                           break;
+//                                                                                                                                   }
+//
+//                                                                                                                               } else {
+//                                                                                                                                   NSLog(@"Error: %@", task.error);
+//                                                                                                                               }
+//                                                                                                                           }
+//
+//                                                                                                                           if (task.result) {
+//                                                                                                                               AWSS3TransferManagerDownloadOutput *downloadOutput = task.result;
+//                                                                                                                           }
+//                                                                                                                           return nil;
+//                                                                                                                       }];
+//                                                               [self.messageList addObject:info];
+//                                                               [self.myTableView reloadData];
+//                                                               [self.myTableView
+//                                                                scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
+//                                                                                                          inSection:0]
+//                                                                atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+//
+////                                                               [self callAPIToSubmitAttachment:s3URL];
+                                                           }
+                                                           return nil;
+                                                       }];
+}
+
 
 #pragma mark - Memory Warning Methods
 - (void)didReceiveMemoryWarning {

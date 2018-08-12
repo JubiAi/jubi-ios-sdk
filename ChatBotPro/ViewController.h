@@ -11,6 +11,8 @@
 #import <Vertigo/TGRImageViewController.h>
 #import <Vertigo/TGRImageZoomAnimationController.h>
 #import "AppManager.h"
+
+
 @interface ViewController : UIViewController<UIViewControllerTransitioningDelegate>
 @property (strong, nonatomic) NSMutableArray *messageList;
 @property(nonatomic,retain)UIPopoverPresentationController *dateTimePopover8;

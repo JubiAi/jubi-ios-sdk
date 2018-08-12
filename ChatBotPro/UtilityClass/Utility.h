@@ -17,6 +17,14 @@ NS_ASSUME_NONNULL_BEGIN
 +(void)saveFile:(NSString *)strUrl;
 +(UIWindow *)getWindow;
 +(NSBundle *)getBundleForChatBotPro;
++(NSString *)getFileUrlInDocDir:(NSString *)strUrl;
++(NSData *)getFileFromTempDir:(NSString *)strUrl;
++(NSString *)saveImage:(NSData*)imageData withName:(NSString*)imageName;
++(UIImage*)retrieveImage:(NSString*)fileNamewhichtoretrieve;
++ (void)removeImage:(NSString *)filename;
++ (BOOL)renameFileFrom:(NSString*)oldName to:(NSString *)newName;
++(NSString*)getFileNameFromURL :(NSString*) URL;
++(NSData *)getreceivedFileInDocDir:(NSString *)strUrl;
 @end
 
 NS_ASSUME_NONNULL_END
