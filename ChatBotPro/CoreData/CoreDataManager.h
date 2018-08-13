@@ -15,7 +15,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CoreDataManager : NSObject
 + (CoreDataManager *)sharedManager;
 
+@property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
+@property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
+@property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
+- (void)saveContext;
+- (NSURL *)applicationDocumentsDirectory;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -11,6 +11,7 @@
 #import <Vertigo/TGRImageViewController.h>
 #import <Vertigo/TGRImageZoomAnimationController.h>
 #import "AppManager.h"
+#import "CoreDataHelper.h"
 
 
 @interface ViewController : UIViewController<UIViewControllerTransitioningDelegate>

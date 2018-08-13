@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "MessageInfo.h"
 #import "Messages+CoreDataProperties.h"
-
+#import "CoreDataManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 +(NSDictionary *)dictionaryFromData:(NSData *)data;
 +(void)saveSentMessageDataTolocalDB:(MessageInfo *)msgInfo;
 +(void)updateMessageDataTolocalDBFrom:(NSString *)oldVal to:(NSString *)newVa;
++(NSUInteger)getMessagesCount;
++(NSArray *)getMessagesData;
 @end
 
 NS_ASSUME_NONNULL_END

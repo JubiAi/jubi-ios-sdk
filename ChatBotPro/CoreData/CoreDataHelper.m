@@ -33,9 +33,25 @@ NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data
 
 +(void)saveSentMessageDataTolocalDB:(MessageInfo *)msgInfo{
     //Save to persistant storage
-    [MagicalRecord saveWithBlock:^(NSManagedObjectContext *localContext){
-        Messages *message = [Messages MR_createEntityInContext:localContext];
+//    [MagicalRecord saveWithBlock:^(NSManagedObjectContext *localContext){
+//        Messages *message = [Messages MR_createEntityInContext:localContext];
         //        message.messageId = msgInfo.messageId;
+    
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Messages"];
+    
+    NSError *error;
+    NSArray *arrResults = [[[CoreDataManager sharedManager] managedObjectContext] executeFetchRequest:request error:&error];
+    
+    if (!arrResults || error){
+        
+        // Handle Error
+        //NSLog(@"************** Error in add Screen to core data method");
+        return;
+    }
+    
+    Messages *message = [NSEntityDescription insertNewObjectForEntityForName:@"Messages" inManagedObjectContext:[[CoreDataManager sharedManager] managedObjectContext]];
+    
+  
         message.message = msgInfo.message;
         message.descriptionStr = msgInfo.descriptionStr;
         
@@ -64,24 +80,68 @@ NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data
         message.isProgress = msgInfo.isProgress;
         message.isDoc = msgInfo.isDoc;
         message.messageTime = [NSDate date];
+    
+      [[CoreDataManager sharedManager] saveContext];
+//    }
+//                      completion:^(BOOL success, NSError *error){
+//
+//                      }];
+}
+
++(NSUInteger)getMessagesCount
+{
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Messages"];
+    
+    NSError *error;
+    NSArray *arrResults = [[[CoreDataManager sharedManager] managedObjectContext] executeFetchRequest:request error:&error];
+    
+    if (!arrResults || error)
+    {
         
     }
-                      completion:^(BOOL success, NSError *error){
-                          
-                      }];
+    else
+    {
+        
+        
+        return arrResults.count;
+        
+    }
+    return 0;
+}
+
++(NSArray *)getMessagesData
+{
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Messages"];
+    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"messageTime" ascending:YES];
+    [request setSortDescriptors:@[sort]];
+    NSError *error;
+    NSArray *arrResults = [[[CoreDataManager sharedManager] managedObjectContext] executeFetchRequest:request error:&error];
+    
+    if (!arrResults || error)
+    {
+        
+    }
+    else
+    {
+        
+        
+        return arrResults;
+        
+    }
+    return nil;
 }
 
 +(void)updateMessageDataTolocalDBFrom:(NSString *)oldVal to:(NSString *)newVal{
 
     
-    [MagicalRecord saveWithBlock:^(NSManagedObjectContext *localContext){
-        NSPredicate *imageFilter = [NSPredicate predicateWithFormat:@"gifImage == %@",oldVal];
-        Messages *message = [Messages MR_findFirstWithPredicate:imageFilter inContext:localContext];
-        message.gifImage = newVal;
-        
-    }
-                      completion:^(BOOL success, NSError *error){
-                          
-                      }];
+//    [MagicalRecord saveWithBlock:^(NSManagedObjectContext *localContext){
+//        NSPredicate *imageFilter = [NSPredicate predicateWithFormat:@"gifImage == %@",oldVal];
+//        Messages *message = [Messages MR_findFirstWithPredicate:imageFilter inContext:localContext];
+//        message.gifImage = newVal;
+//        
+//    }
+//                      completion:^(BOOL success, NSError *error){
+//                          
+//                      }];
 }
 @end

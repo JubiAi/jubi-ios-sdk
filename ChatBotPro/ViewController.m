@@ -65,7 +65,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [MagicalRecord setupAutoMigratingCoreDataStack];
+//    [MagicalRecord setupAutoMigratingCoreDataStack];
 
     [self initialSetup];
     [self setDummyData];
@@ -75,8 +75,8 @@
     
 
 
-        [MagicalRecord enableShorthandMethods];
-        
+//        [MagicalRecord enableShorthandMethods];
+    
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(receiveTestNotification:)
@@ -100,8 +100,8 @@
 
 
 -(void)initialApiCall{
-    NSArray *dataArr = [Messages MR_findAllSortedBy:@"messageTime" ascending:YES];
-    if(dataArr.count == 0){
+    NSUInteger count = [CoreDataHelper getMessagesCount];
+    if(count == 0){
      [self callAPIToSubmitAnswer:@"Start over"];
     }
     else{
@@ -710,7 +710,7 @@
     MessageInfo *info = [MessageInfo new];
     info.message = @"Read more";
     info.isSender = true;
-    [self saveMessageDataTolocalDB:info];
+    [CoreDataHelper saveSentMessageDataTolocalDB:info];
 
 }
 
@@ -969,7 +969,7 @@
     }
 }
 
--(void)saveMessageDataTolocalDB:(MessageInfo *)msgInfo{
+/*-(void)saveMessageDataTolocalDB:(MessageInfo *)msgInfo{
     //Save to persistant storage
         [MagicalRecord saveWithBlock:^(NSManagedObjectContext *localContext){
         Messages *message = [Messages MR_createEntityInContext:localContext];
@@ -1005,12 +1005,12 @@
                       [self refreshData];
                   }];
 }
-
+*/
 
 -(void) refreshData
 {
     [self.messageList removeAllObjects];
-    NSArray *allRecords = [Messages MR_findAllSortedBy:@"messageTime" ascending:YES];
+    NSArray *allRecords = [CoreDataHelper getMessagesData];//[Messages MR_findAllSortedBy:@"messageTime" ascending:YES];
     if (allRecords.count == 0) {
         return;
     }
@@ -1166,7 +1166,7 @@
     MessageInfo *info = [MessageInfo new];
     info.message = notification.object;
     info.isSender = true;
-    [self saveMessageDataTolocalDB:info];
+    [CoreDataHelper saveSentMessageDataTolocalDB:info];
 
     
     [self performSelector:@selector(callApi:) withObject:notification.object afterDelay:1];

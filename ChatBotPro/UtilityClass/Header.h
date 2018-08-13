@@ -68,8 +68,6 @@
 #import "NSDictionary+NullChecker.h"
 #import "MBProgressHUD.h"
 #import "MPOSUtility.h"
-#import <MagicalRecord/MagicalRecord.h>
-#import <MagicalRecord/MagicalRecord+ShorthandMethods.h>
 
 static NSString *pDeviceToken                  =   @"deviceToken";
 static NSString * pIsRemember                  =   @"isRemenber";
