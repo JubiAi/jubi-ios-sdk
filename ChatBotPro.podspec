@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "ChatBotPro"
-  s.version      = "1.0.4"
+  s.version      = "1.0.41"
   s.summary      = "Pod for ChatBotPro."
 
   # This description is used to generate tags and improve search results.
@@ -92,6 +92,7 @@ Pod::Spec.new do |s|
   #
 
   s.source_files  = "ChatBotPro", "ChatBotPro/**/*.{h,m}"
+  s.source_files  = "ChatBotPro", "ChatBotPro/**/*.xcdatamodel"
   s.exclude_files = "ChatBotPro/**/LaunchScreen.storyboard"
 
   # s.public_header_files = "Classes/**/*.h"
@@ -107,10 +108,13 @@ Pod::Spec.new do |s|
 
   # s.resource  = "icon.png"
   # s.resources = "Resources/*.png"
+  s.resources = [ "ChatBotPro","ChatBotPro/**/*.xcdatamodel"]
+
     s.resource_bundle = { 'ChatBotPro' => [ 'ChatBotPro/**/*.{png,jpg,storyboard,xib,lproj,xcassets,xcdatamodeld}' ] }
     #s.resources = “ChatBotPro/*.storyboard”, “ChatBotPro/*.xcassets” 
 
   # s.preserve_paths = "FilesToSave", "MoreFilesToSave"
+  s.preserve_paths = "ChatBotPro/**/*.xcdatamodel"
 
 
   # ――― Project Linking ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
