@@ -30,6 +30,7 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AVFoundation/AVAsset.h>
+#import "IDMPhotoBrowser.h"
 #define kBaseUrl @"https://early-salary-backend.herokuapp.com/ios/JUBI15Q9uk_EarlySalary"
 #define kAWSBucketName @"mobile-dev-jubi"
 
@@ -65,7 +66,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-//    [MagicalRecord setupAutoMigratingCoreDataStack];
 
     [self initialSetup];
     [self setDummyData];
@@ -75,7 +75,6 @@
     
 
 
-//        [MagicalRecord enableShorthandMethods];
     
     
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -662,43 +661,17 @@
         NSData *fileData = [Utility getFileInDocDir:info.gifImage];
         image = [UIImage animatedImageWithAnimatedGIFData:fileData];
     }
-    _previewImage = [[UIImageView alloc] initWithImage:image];
-    _previewImage.frame = self.view.bounds;
-    _previewImage.contentMode = UIViewContentModeScaleAspectFill;
-    _previewImage.userInteractionEnabled = YES;
-    _previewImage.backgroundColor = [UIColor whiteColor];
-//    [self.view addSubview:_previewImage];
     
-    UIButton *crossBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [crossBtn setImage:[UIImage imageNamed:@"corss"] forState:UIControlStateNormal];
-    crossBtn.frame = CGRectMake(self.view.bounds.size.width - 54, 25, 44, 44);
-    [crossBtn addTarget:self action:@selector(removeImageVIew) forControlEvents:UIControlEventTouchUpInside];
-//    [_previewImage addSubview:crossBtn];
+    IDMPhoto *photos = [IDMPhoto photoWithImage:image];
+    IDMPhotoBrowser *browser = [[IDMPhotoBrowser alloc] initWithPhotos:[NSArray arrayWithObject:photos]];
+    [browser setDisplayToolbar:NO];
+    [self presentViewController:browser animated:YES completion:nil];
+
+
     
-//    [self.view bringSubviewToFront:_previewImage];
-    
-   
-    
-    TGRImageViewController *viewController = [[TGRImageViewController alloc] initWithImage:_previewImage.image];
-    // Don't forget to set ourselves as the transition delegate
-    viewController.transitioningDelegate = self;
-    
-    [self presentViewController:viewController animated:YES completion:nil];
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
-    if ([presented isKindOfClass:TGRImageViewController.class]) {
-        return [[TGRImageZoomAnimationController alloc] initWithReferenceImageView:_previewImage];
-    }
-    return nil;
-}
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
-    if ([dismissed isKindOfClass:TGRImageViewController.class]) {
-        return [[TGRImageZoomAnimationController alloc] initWithReferenceImageView:_previewImage];
-    }
-    return nil;
-}
 
 -(void)removeImageVIew{
     [_previewImage removeFromSuperview];
@@ -710,7 +683,12 @@
     MessageInfo *info = [MessageInfo new];
     info.message = @"Read more";
     info.isSender = true;
+    ///save sent message to local db
     [CoreDataHelper saveSentMessageDataTolocalDB:info];
+    
+    [self.messageList addObject:info];
+    
+    [self addMessageToTableView];
 
 }
 
@@ -809,6 +787,21 @@
      atScrollPosition:UITableViewScrollPositionBottom animated:YES];
     });
 }
+
+-(void)RemoveMessageToTableView:(NSIndexPath *)indexPath{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.myTableView beginUpdates];
+        [self.myTableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+        [self.myTableView endUpdates];
+        
+        [self.myTableView
+         scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.messageList.count-1
+                                                   inSection:0]
+         atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    });
+}
+
+
 
 -(void)removeProgressCell{
     for(MessageInfo *info in self.messageList){
@@ -1166,7 +1159,13 @@
     MessageInfo *info = [MessageInfo new];
     info.message = notification.object;
     info.isSender = true;
+   
+    ///save sent message to local db
     [CoreDataHelper saveSentMessageDataTolocalDB:info];
+    
+    [self.messageList addObject:info];
+    
+    [self.myTableView reloadData];
 
     
     [self performSelector:@selector(callApi:) withObject:notification.object afterDelay:1];

@@ -8,6 +8,7 @@
 
 #import "CoreDataManager.h"
 #import "Header.h"
+#import "Utility.h"
 #define kFrameworkURL @"ChatBot.sqlite"
 
 @interface CoreDataManager ()
@@ -53,7 +54,11 @@ static CoreDataManager *coreDataManager;
     
     //    NSString *modelPath = [[NSBundle mainBundle] URLForResource:@"Instappy" withExtension:@"momd"];
     
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"ChatBot" withExtension:@"momd"];
+    NSBundle *resourceBundle = [Utility getBundleForChatBotPro];
+    if (resourceBundle == nil) {
+        resourceBundle = [NSBundle mainBundle];
+    }
+    NSURL *modelURL = [resourceBundle URLForResource:@"ChatBot" withExtension:@"momd"];
     _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
     
     return _managedObjectModel;
