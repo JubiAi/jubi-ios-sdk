@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "ChatBotPro"
-  s.version      = "1.0.42"
+  s.version      = "1.0.43"
   s.summary      = "Pod for ChatBotPro."
 
   # This description is used to generate tags and improve search results.
@@ -91,7 +91,7 @@ Pod::Spec.new do |s|
   #  Not including the public_header_files will make all headers public.
   #
 
-  s.source_files  = "ChatBotPro", "ChatBotPro/**/*.{h,m}", "ChatBotPro/**/*.xcdatamodel"
+  s.source_files  = "ChatBotPro", "ChatBotPro/**/*.{h,m}"
   #s.source_files  = "ChatBotPro", "ChatBotPro/**/*.xcdatamodel"
   s.exclude_files = "ChatBotPro/**/LaunchScreen.storyboard"
 
@@ -110,7 +110,7 @@ Pod::Spec.new do |s|
   # s.resources = "Resources/*.png"
   # s.resources = [ "ChatBotPro","ChatBotPro/**/*.xcdatamodel"]
 	
-    # s.resource_bundle = { 'ChatBotPro' => [ 'ChatBotPro/**/*.{png,jpg,storyboard,xib,lproj,xcassets,xcdatamodeld}' ] }
+     s.resource_bundle = { 'ChatBotPro' => [ 'ChatBotPro/**/*.{png,jpg,storyboard,xib,lproj,xcassets,xcdatamodeld}' ] }
     #s.resources = “ChatBotPro/*.storyboard”, “ChatBotPro/*.xcassets” 
 
   # s.preserve_paths = "FilesToSave", "MoreFilesToSave"
@@ -143,7 +143,7 @@ Pod::Spec.new do |s|
    s.dependency "Firebase/Core"
    s.dependency "Vertigo"
    s.dependency "FirebaseMessaging"
-   s.dependency "MagicalRecord"
+   #s.dependency "MagicalRecord"
    s.dependency 'AWSS3', '~> 2.6.13'            # For file transfers
    #s.dependency 'AWSMobileClient', '~> 2.6.13'  # For AWSMobileClient
    #s.dependency 'AWSCognito', '~> 2.6.13'       # For data sync
