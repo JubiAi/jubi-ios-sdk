@@ -42,8 +42,21 @@
         CGPoint translation = [recognizer translationInView:self.view];
         
         CGRect newButtonFrame = draggedButton.frame;
-        newButtonFrame.origin.x += translation.x;
+            newButtonFrame.origin.x += translation.x;
+        if (newButtonFrame.origin.x < 0) {
+            newButtonFrame.origin.x = 0;
+        }
+        else if(newButtonFrame.origin.x > (self.view.frame.size.width - newButtonFrame.size.width)){
+            newButtonFrame.origin.x = (self.view.frame.size.width - newButtonFrame.size.width);
+        }
+
         newButtonFrame.origin.y += translation.y;
+        if (newButtonFrame.origin.y < 0) {
+            newButtonFrame.origin.y = 0;
+        }
+        else if(newButtonFrame.origin.y > (self.view.frame.size.height - newButtonFrame.size.height)){
+            newButtonFrame.origin.y = (self.view.frame.size.height - newButtonFrame.size.height);
+        }
         draggedButton.frame = newButtonFrame;
         
         [recognizer setTranslation:CGPointZero inView:self.view];

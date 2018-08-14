@@ -149,8 +149,9 @@
 }
 -(void)setDummyData{
     self.messageList = [[NSMutableArray alloc] init];
+    
 
-    menuList = [[NSArray alloc] initWithObjects:@"Start over",@"Advantages of EarlySalary loan",@"How can I apply for loan",@"EarlySalary vs CreditCard",@"Interest rate on EarlySalary loans",@"How to repay the loan",@"Talk to agent", @"Cancel conversation",nil];
+    menuList = [[NSArray alloc] initWithObjects:@"Start Over",@"Statement of Account",@"EarlySalary Products",@"Find my Eligibility",@"Operational Cities",@"EarlySalary Benefits",@"EarlySalary vs Credit Cards", @"Repayment Options",@"Talk to an agent",@"Cancel Conversation",nil];
     
 }
 
@@ -255,7 +256,7 @@
     UIDocumentMenuViewController *documentProviderMenu =
     [[UIDocumentMenuViewController alloc] initWithDocumentTypes:@[@"public.data"]
                                                          inMode:UIDocumentPickerModeOpen];
-    
+    [UINavigationBar appearance].tintColor = [UIColor colorWithRed:0 green:204/255 blue:217/255 alpha:1.0];
     documentProviderMenu.delegate = self;
     documentProviderMenu.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:documentProviderMenu animated:YES completion:nil];
@@ -406,6 +407,7 @@
 - (void)documentMenu:(nonnull UIDocumentMenuViewController *)documentMenu didPickDocumentPicker:(nonnull UIDocumentPickerViewController *)documentPicker {
     
     documentPicker.delegate = self;
+    [UINavigationBar appearance].tintColor = [UIColor redColor];
     [self presentViewController:documentPicker animated:YES completion:nil];
 }
 
