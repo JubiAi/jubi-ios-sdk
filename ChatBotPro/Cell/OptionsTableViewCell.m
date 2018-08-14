@@ -23,10 +23,7 @@
 
 -(void)setData:(NSArray *)dataArray{
     CGFloat yAxis = 5.0;
-    NSMutableArray *temparr = [NSMutableArray arrayWithArray:dataArray];
-    [temparr addObject:@"for testing1"];
-    [temparr addObject:@"for testing2"];
-    for (NSString *titleStr in temparr){
+    for (NSString *titleStr in dataArray){
         UIButton *btn =[UIButton buttonWithType:UIButtonTypeSystem];
         [btn setBackgroundColor:[UIColor whiteColor]];
         UIFont *font = [UIFont systemFontOfSize:15];
@@ -57,14 +54,7 @@
         [self.containerView addSubview:btn];
         yAxis = yAxis+btn.frame.size.height+10;
     }
-    CGRect frame = self.frame;
-    frame.size.height = yAxis;
-    self.frame = frame;
     
-//    CGRect frame2 = self.containerView.frame;
-//    frame2.size.height = yAxis;
-    self.containerView.frame = frame;
-    self.contentView.frame = frame;
 }
 
 -(void)buttonClicked:(UIButton *)sender{
