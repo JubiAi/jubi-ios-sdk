@@ -55,6 +55,7 @@
     }
     for(NSDictionary *dict in buttnArray){
         [cell.readMoreBtn setTitle:[dict objectForKey:@"text"] forState:UIControlStateNormal];
+        [[cell.readMoreBtn layer] setValue:dict forKey:@"data"];
     }
     [cell.readMoreBtn addTarget:self action:@selector(readMoreBtn:) forControlEvents:UIControlEventTouchUpInside];
      [cell.readMoreBtn2 addTarget:self action:@selector(readMoreBtn:) forControlEvents:UIControlEventTouchUpInside];
@@ -66,6 +67,8 @@
 
 -(void)readMoreBtn:(UIButton *)btn{
     NSLog(@"buttontext %@",btn.titleLabel.text);
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"collectionCellButtonActionNotification" object:btn.titleLabel.text];
+    NSDictionary  *yourObj = [[btn layer] valueForKey:@"data"];
+    NSString *string = [yourObj objectForKey:@"data"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"collectionCellButtonActionNotification" object:string];
 }
 @end

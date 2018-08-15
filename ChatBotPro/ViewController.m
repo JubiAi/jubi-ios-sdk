@@ -151,7 +151,7 @@
     self.messageList = [[NSMutableArray alloc] init];
     
 
-    menuList = [[NSArray alloc] initWithObjects:@"Start Over",@"Statement of Account",@"EarlySalary Products",@"Find my Eligibility",@"Operational Cities",@"EarlySalary Benefits",@"EarlySalary vs Credit Cards", @"Repayment Options",@"Talk to an agent",@"Cancel Conversation",nil];
+    menuList = [[NSArray alloc] initWithObjects:@"Start Over",@"Statement of Account",@"EarlySalary Products",@"Find my Eligibility",@"Operational Cities",@"EarlySalary Benefits", @"Repayment Options",@"Talk to an agent",@"Cancel Conversation",nil];
     
 }
 
@@ -255,7 +255,7 @@
 //    @[@"public.data",@"public.content",@"public.audiovisual-content",@"public.movie",@"public.audiovisual-content",@"public.video",@"public.audio",@"public.text",@"public.data",@"public.zip-archive",@"com.pkware.zip-archive",@"public.composite-content",@"public.text"]
     UIDocumentMenuViewController *documentProviderMenu =
     [[UIDocumentMenuViewController alloc] initWithDocumentTypes:@[@"public.data"]
-                                                         inMode:UIDocumentPickerModeOpen];
+                                                         inMode:UIDocumentPickerModeImport];
     [UINavigationBar appearance].tintColor = [UIColor colorWithRed:0 green:204/255 blue:217/255 alpha:1.0];
     documentProviderMenu.delegate = self;
     documentProviderMenu.modalPresentationStyle = UIModalPresentationFullScreen;
@@ -306,6 +306,8 @@
     if (@available(iOS 11.0, *)) {
         NSURL *imageURL;
         if ([mediaType isEqualToString:@"public.image"]) {
+            
+            
             UIImage *chosenImage = info[UIImagePickerControllerOriginalImage];
             if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
                 NSString *fileName = [NSString stringWithFormat:@"%@.jpg",[NSDate date]];
@@ -331,7 +333,7 @@
             MessageInfo *info1 = [MessageInfo new];
             info1.imageName = chosenImage;
             info1.fileNameStr = [imageURL lastPathComponent];
-            info1.gifImage = [NSString stringWithFormat:@"%@",imageURL];
+            info1.gifImage = [NSString stringWithFormat:@"file://%@",imageURL];
             info1.isSender = true;
 
             
@@ -418,6 +420,7 @@
     MessageInfo *info1 = [MessageInfo new];
     info1.videoURL = url;
     info1.message = [request.URL lastPathComponent];
+    info1.fileNameStr = [request.URL lastPathComponent];
     info1.isDoc = true;
     info1.isSender = true;
     
@@ -427,6 +430,8 @@
     [self.messageList addObject:info1];
     
     [self addMessageToTableView];
+    
+    [self uploadFileToServer:info1];
 
 }
 
@@ -862,6 +867,7 @@
     
     NSString *token = [[NSUserDefaults standardUserDefaults] stringForKey:@"token"];
     NSMutableDictionary * requestDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                         @"uploaded file", @"lastAnswer",
                                          @"attachment", @"type",url,@"url",
                                          token, @"iosId",@"JUBI15Q9uk_EarlySalary",@"projectId",nil];
     
@@ -1218,7 +1224,8 @@
                                                                            NSLog(@"Error: %@", task.error);
                                                                            break;
                                                                    }
-                                                               } else {
+                                                               }
+                                                               else {
                                                                    // Unknown error.
                                                                    NSLog(@"Error: %@", task.error);
                                                                }
