@@ -68,7 +68,6 @@
 -(void)readMoreBtn:(UIButton *)btn{
     NSLog(@"buttontext %@",btn.titleLabel.text);
     NSDictionary  *yourObj = [[btn layer] valueForKey:@"data"];
-    NSString *string = [yourObj objectForKey:@"data"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"collectionCellButtonActionNotification" object:string];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"collectionCellButtonActionNotification" object:yourObj];
 }
 @end

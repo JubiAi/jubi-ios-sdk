@@ -502,7 +502,9 @@
 
 //    
 //    //send request to bot
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"collectionCellButtonActionNotification" object:[menuList objectAtIndex:indexPath.row]];
+    
+     NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:[menuList objectAtIndex:indexPath.row],@"text",[menuList objectAtIndex:indexPath.row],@"data", nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"collectionCellButtonActionNotification" object:dict];
 }
 
 
@@ -1165,7 +1167,7 @@
     
 //    NSLog(@"userInfo %@",notification.object);
     MessageInfo *info = [MessageInfo new];
-    info.message = notification.object;
+    info.message = [notification.object objectForKey:@"text"];
     info.isSender = true;
    
     ///save sent message to local db
@@ -1176,7 +1178,7 @@
     [self.myTableView reloadData];
 
     
-    [self performSelector:@selector(callApi:) withObject:notification.object afterDelay:1];
+    [self performSelector:@selector(callApi:) withObject:[notification.object objectForKey:@"data"] afterDelay:1];
     
 }
 

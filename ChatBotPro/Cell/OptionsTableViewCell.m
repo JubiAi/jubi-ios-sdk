@@ -58,6 +58,7 @@
 }
 
 -(void)buttonClicked:(UIButton *)sender{
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"collectionCellButtonActionNotification" object:sender.titleLabel.text];
+    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:sender.titleLabel.text,@"text",sender.titleLabel.text,@"data", nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"collectionCellButtonActionNotification" object:dict];
 }
 @end
